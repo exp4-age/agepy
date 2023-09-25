@@ -6,4 +6,7 @@ Welcome to agepy's documentation!
    :caption: Tutorials
    :hidden:
 
+   installation
+   reference
    tutorials
+   contribute
