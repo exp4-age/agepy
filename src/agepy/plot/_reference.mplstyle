@@ -1,3 +1,6 @@
+# Matplotlib style sheet with all the default values.
+# Should only be used as a reference to check default values and available params.
+
 # ***************************************************************************
 # * LINES                                                                   *
 # ***************************************************************************
