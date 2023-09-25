@@ -2,5 +2,8 @@ Welcome to agepy's documentation!
 =================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Tutorials
+   :hidden:
+
+   tutorials
