@@ -22,7 +22,15 @@ def use(styles):
     ----------
     styles: str or list of string
         Styles to be loaded using ``plt.style.use``. Available styles 
-        can be viewed by calling ``agepy.plot.available_styles``.
+        can be viewed by calling ``agepy.plot.age_styles`` and 
+        ``agepy.plot.mpl_styles``.
+
+    Example
+    -------
+    How to use the AGE style:
+
+    >>> from agepy import plot
+    >>> plot.use("age")
 
     """
     load_styles = []

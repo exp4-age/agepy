@@ -30,7 +30,7 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-napoleon_numpy_docstring = True
+napoleon_google_docstring = False
 napoleon_include_init_with_doc = True
 
 copybutton_prompt_text = ">>> "
@@ -42,4 +42,4 @@ copybutton_prompt_text = ">>> "
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_logo = "_static/logo.png"
+html_logo = "_static/logo_age.png"
