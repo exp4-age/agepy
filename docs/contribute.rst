@@ -21,13 +21,22 @@ How to contribute
 1. The agepy repository is protected, which means that you can't push
    any changes to it. Therefore, create a *Fork* of the agepy 
    repository. This creates your own *copy* of the repository, which is 
-   linked to the original.
+   linked to the original. In order to do this click 
+   **Create a new fork**
+
+    .. image:: _static/create_fork_1.png
+        :width: 800
+
+   on the `agepy`_ GitHub page and then **Create fork**
+
+    .. image:: _static/create_fork_2.png
+        :width: 800
 
 2. Clone the original repository to your PC::
 
-    git clone https://github.com/age/agepy.git
+    git clone https://github.com/exp4-age/agepy.git
 
-3. Add your fork as a remote ::
+3. Move into the new agepy directory and add your fork as a remote ::
 
     git remote add <username> https://github.com/<username>/agepy.git
 
@@ -39,15 +48,28 @@ How to contribute
    Insert your GitHub username into <username>, so that you can 
    *push* and *pull* to / from your *Fork*.
 
+    .. note::
+
+        The <username> directly after ``git remote add`` is just the 
+        name for the remote and you could give it a different name that
+        makes sense to you. 
+
 4. In order to test the code you write, setup a virtual python 
    environment (conda, venv, ...) and install the agepy package in 
-   editable mode: Move into the main directory of the package and run ::
+   editable mode::
 
-    pip install -e .
+    pip install -e path/to/agepy
 
+   Replace ``path/to/agepy`` with the path to your cloned repository.
    By doing this the package will be sourced from the code in your 
    local git repository and any changes you make will be immediately
    present, when you want to test / debug them.
+
+    .. note::
+
+        If you are using the *Anaconda Navigator* go to your 
+        environments, choose / create an environment, click on the play
+        button and select ``Open Terminal`` and run the command.
 
 5. Once you have implemented your changes / new code, you can follow
    the usual git workflow by adding the changes ::
@@ -91,8 +113,8 @@ Some guidelines are listed here:
 * Provide a comment for every important line in your code.
 
 
-Docstrings
-----------
+Writing docstrings
+------------------
 
 For improved legibility, docstrings are parsed using the 
 `sphinx.ext.napoleon`_ extension. This means that the docstrings can and
@@ -160,7 +182,16 @@ True
 
 More comprehensive examples can be written in the form of Jupyter
 notebooks and added to the tutorials section.
+
+
+Writing tutorials
+-----------------
+
+Tutorials can be written in the form of `Jupyter Notebook`_s in the 
+``docs/_notebooks/`` directory.
     
 
+.. _agepy: https://github.com/exp4-age/agepy
 .. _sphinx.ext.napoleon: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
 .. _PEP 8: https://peps.python.org/pep-0008/
+.. _Jupyter Notebook: https://jupyter-notebook.readthedocs.io/en/latest/
