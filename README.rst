@@ -28,7 +28,9 @@ tutorial in documentation)::
 Documentation
 -------------
 
-At some point the documentation will be hosted somewhere. 
+For now the `documentation`_ is only available from within the
+university network. It might work with the university vpn, but it
+also might not work.
 
 
 Contributing
@@ -38,3 +40,6 @@ In the documentation is a section on how to contribute.
 
 Contributions to this package DO NOT grant co-authorship rights to any
 papers written in the AGE.
+
+
+.. _documentation: http://141.51.197.64:9001
