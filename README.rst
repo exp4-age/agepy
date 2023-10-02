@@ -22,8 +22,6 @@ is available.
 Documentation
 -------------
 
-For access to the documentation open your local version of the file 
-``docs/_build/index.html`` in a browser.
 At some point the documentation will be hosted somewhere. 
 
 
