@@ -11,12 +11,18 @@ agepy
 Installation
 ------------
 
-Currently, only installation with a local version of the repository 
-and ::
+Install with ::
+
+    pip install git+https://github.com/exp4-age/agepy.git
+
+This will create a temporary clone of the repository and build the
+package in your environment.
+
+If you want to help develop and contribute to the package, first clone
+the repository to your PC and install in editable mode (detailed 
+tutorial in documentation)::
 
     pip install -e path/to/agepy
-
-is available.
 
 
 Documentation
