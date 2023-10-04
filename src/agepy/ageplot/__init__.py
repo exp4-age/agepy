@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-age_styles = ["age", "pccp"]
+age_styles = ["age", "pccp", "powerpoint", "latexbeamer"]
 mpl_styles = ["default"]
 mpl_styles.append(plt.style.available)
 
