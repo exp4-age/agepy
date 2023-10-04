@@ -1,11 +1,11 @@
-agepy.plot
-==========
+agepy.ageplot
+=============
 
 
 Functions
 ---------
 
-.. automodule:: agepy.plot
+.. automodule:: agepy.ageplot
    :members:
    :undoc-members:
    :show-inheritance:
