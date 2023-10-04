@@ -101,8 +101,23 @@ How to contribute
    make corrections and finally approve the pull_request. The pull
    request will then get merged by an owner / maintainer.
 
-8. In order to sync your fork with the now updated origin, you can 
-   follow the `Syncing a fork`_ tutorial.
+8. In order to sync your fork with the now updated origin, you can ::
+
+    git pull --rebase origin main
+
+* If you messed up somewhere and just want to reset your local and
+  forked main branch to the version at origin/main, you can do ::
+
+    git reset --hard origin/main
+
+  and ::
+
+    git push --force <username> main
+
+  .. warning::
+
+    This will delete any commits on your main branch that are ahead 
+    of origin/main. 
 
 
 Style guide
