@@ -89,8 +89,20 @@ How to contribute
     git push <username> main
 
 6. The changes are now only on your *Fork* and not in the original
-   repository yet. But now you can open a *Pull request* in the original
-   repository by selecting the commit from your *Fork*.
+   repository yet. But now you can open a *Pull request* from your 
+   forked repository by clicking on *Contribute* and then 
+   *Open pull request*:
+
+    .. image:: _static/pull_request.png
+        :width: 800
+
+   You can then write a few sentences about what you did and open
+   the pull request. Everyone can then discuss the changes, suggest / 
+   make corrections and finally approve the pull_request. The pull
+   request will then get merged by an owner / maintainer.
+
+8. In order to sync your fork with the now updated origin, you can 
+   follow the `Syncing a fork`_ tutorial.
 
 
 Style guide
@@ -192,6 +204,7 @@ Tutorials can be written in the form of `Jupyter Notebook`_s in the
     
 
 .. _agepy: https://github.com/exp4-age/agepy
+.. _Syncing a fork: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line
 .. _sphinx.ext.napoleon: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
 .. _PEP 8: https://peps.python.org/pep-0008/
 .. _Jupyter Notebook: https://jupyter-notebook.readthedocs.io/en/latest/
