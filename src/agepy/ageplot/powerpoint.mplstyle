@@ -3,9 +3,9 @@
 ## ***************************************************************************
 ## See https://matplotlib.org/stable/api/artist_api.html#module-matplotlib.lines
 ## for more information on line properties.
-lines.linewidth:       0.83     # line width in points
-lines.markeredgewidth: 0.83     # the line width around the marker symbol
-lines.markersize:      3.3      # marker size, in points
+lines.linewidth:       1.17     # line width in points
+lines.markeredgewidth: 1.17     # the line width around the marker symbol
+lines.markersize:      4.66     # marker size, in points
 
 
 ## ***************************************************************************
@@ -14,7 +14,7 @@ lines.markersize:      3.3      # marker size, in points
 ## Following are default face and edge colors, default tick sizes,
 ## default font sizes for tick labels, and so on.  See
 ## https://matplotlib.org/stable/api/axes_api.html#module-matplotlib.axes
-axes.linewidth:     0.6      # edge line width
+axes.linewidth:     0.85     # edge line width
 axes.titlesize:     8        # font size of the axes title
 axes.titleweight:   normal   # font weight of title
 axes.titlepad:      4.0      # pad between axes and title in points
@@ -27,18 +27,18 @@ axes.labelweight:   normal   # weight of the x and y labels
 ## * TICKS                                                                   *
 ## ***************************************************************************
 ## See https://matplotlib.org/stable/api/axis_api.html#matplotlib.axis.Tick
-xtick.major.size:    3.5     # major tick size in points
-xtick.minor.size:    2       # minor tick size in points
-xtick.major.width:   0.6     # major tick width in points
-xtick.minor.width:   0.4     # minor tick width in points
+xtick.major.size:    4.94    # major tick size in points
+xtick.minor.size:    2.82    # minor tick size in points
+xtick.major.width:   0.85    # major tick width in points
+xtick.minor.width:   0.56    # minor tick width in points
 xtick.major.pad:     3.0     # distance to major tick label in points
 xtick.minor.pad:     2.9     # distance to the minor tick label in points
 xtick.labelsize:     7       # font size of the tick labels
 
-ytick.major.size:    3.5     # major tick size in points
-ytick.minor.size:    2       # minor tick size in points
-ytick.major.width:   0.6     # major tick width in points
-ytick.minor.width:   0.4     # minor tick width in points
+ytick.major.size:    4.94    # major tick size in points
+ytick.minor.size:    2.82    # minor tick size in points
+ytick.major.width:   0.85    # major tick width in points
+ytick.minor.width:   0.56    # minor tick width in points
 ytick.major.pad:     3.0     # distance to major tick label in points
 ytick.minor.pad:     2.9     # distance to the minor tick label in points
 ytick.labelsize:     7       # font size of the tick labels
@@ -47,7 +47,7 @@ ytick.labelsize:     7       # font size of the tick labels
 ## ***************************************************************************
 ## * GRIDS                                                                   *
 ## ***************************************************************************
-grid.linewidth: 0.6        # in points
+grid.linewidth: 0.85       # in points
 
 
 ## ***************************************************************************
@@ -57,7 +57,7 @@ legend.markerscale:   0.5      # the relative size of legend markers vs. origina
 legend.fontsize:      7
 legend.title_fontsize: 7       # None sets to the same as the default axes.
 legend.borderaxespad: 0.75
-legend.handlelength: 1.5
+legend.handlelength: 2.1
 
 
 ## ***************************************************************************
@@ -68,7 +68,7 @@ figure.titlesize:   9           # size of the figure title (``Figure.suptitle()`
 figure.titleweight: bold        # weight of the figure title
 figure.labelsize:   8           # size of the figure label (``Figure.sup[x|y]label()``)
 figure.labelweight: normal      # weight of the figure label
-figure.figsize:     3.54, 2.655 # figure size in inches
+figure.figsize:     5, 3.75     # figure size in inches
 
 
 ## ***************************************************************************

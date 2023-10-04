@@ -118,6 +118,8 @@ ytick.minor.visible:  True    # visibility of minor ticks on y-axis
 ## * FIGURE                                                                  *
 ## ***************************************************************************
 ## See https://matplotlib.org/stable/api/figure_api.html#matplotlib.figure.Figure
+figure.dpi:         300    # figure dots per inch
+
 ## Figure layout
 #figure.autolayout: True   # When True, automatically adjust subplot
                            # parameters to make the plot fit the figure

@@ -61,21 +61,21 @@ def use(styles):
 class figsize():
     """
     This class provides access to the width and height of the available 
-    space in different journals in order to choose a figure size for 
+    space in different media in order to choose a figure size for 
     matplotlib plots.
 
     Parameters
     ----------
-    journal: str, optional
-        Name of the journal. Journals, for which the size is 
-        implemented, can be viewed with ``figsize.journals``
+    medium: str, optional
+        Name of the medium. Media, for which the size is 
+        implemented, can be viewed with ``figsize.media``. Default: None
 
     Example
     -------
     A simple example for the PCCP journal:
 
-    >>> from agepy.ageplot import figsize
-    >>> my_figsize = figsize("pccp")
+    >>> from agepy import ageplot
+    >>> my_figsize = ageplot.figsize("pccp")
     >>> my_figsize.wh
     (3.54, 2.6550000000000002)
 
@@ -91,25 +91,28 @@ class figsize():
     # textwidth is used. 
     _pagesizes = {
         "pccp": (3.54, 9.54),
+        "powerpoint": (5, 5.625), # 0.5 of full width
+        "latexbeamer": (2.766, 3.264) # 0.5 of full width
     }
-    journals = list(_pagesizes.keys())
+    media = list(_pagesizes.keys())
 
-    def __init__(self, journal=None):
-        if journal is None:
+    def __init__(self, medium=None):
+        if medium is None:
             self._w = 6.4
             self._h = 4.8
             self._hmax = None
         else:
-            self._w = self._pagesizes[journal][0]
-            self._h = self._pagesizes[journal][0] * 0.75
-            self._hmax = self._pagesizes[journal][1]
+            self._w = self._pagesizes[medium][0]
+            self._h = self._pagesizes[medium][0] * 0.75
+            self._hmax = self._pagesizes[medium][1]
         
         self._wh = (self._w, self._h)
 
     @property
     def w(self):
         """
-        Width in inches available for a figure.
+        Recommended width for a figure. Most of the time this will be
+        equivalent to the full available width.
 
         """
         return self._w
@@ -127,6 +130,11 @@ class figsize():
     def wh(self):
         """
         Tuple (w, h) containing the width and recommended height.
+
+        Note
+        ----
+        If there is a corresponding style sheet, the default figure
+        size will be set to (w, h) by ``ageplot.use()``. 
 
         """
         return self._wh
