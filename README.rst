@@ -3,7 +3,6 @@ agepy
 
 .. image:: https://img.shields.io/badge/version-0.1.dev1-blue
    :alt: Static Badge
-
 .. image:: https://img.shields.io/badge/License-MIT-blue
    :alt: Static Badge
 
