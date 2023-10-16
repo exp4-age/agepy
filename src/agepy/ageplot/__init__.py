@@ -4,6 +4,11 @@ age_styles = ["age", "pccp", "powerpoint", "latexbeamer"]
 mpl_styles = ["default"]
 mpl_styles.append(plt.style.available)
 
+colors = [
+    "#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161", 
+    "#fbafe4", "#949494", "#ece133", "#56b4e9"
+]
+
 def use(styles):
     """
     Function calling ``plt.style.use`` for easier access to the custom 
