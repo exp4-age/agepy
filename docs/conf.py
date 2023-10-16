@@ -24,7 +24,7 @@ extensions = [
     "sphinx_copybutton",
     "matplotlib.sphinxext.plot_directive",
     "IPython.sphinxext.ipython_console_highlighting",
-    "nbsphinx" # https://jupyter-tutorial.readthedocs.io/de/latest/sphinx/nbsphinx.html
+    "nbsphinx",  # https://jupyter-tutorial.readthedocs.io/de/latest/sphinx/nbsphinx.html
 ]
 
 templates_path = ["_templates"]
@@ -34,8 +34,6 @@ napoleon_google_docstring = False
 napoleon_include_init_with_doc = True
 
 copybutton_prompt_text = ">>> "
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

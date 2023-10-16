@@ -5,29 +5,30 @@ mpl_styles = ["default"]
 mpl_styles.append(plt.style.available)
 
 colors = [
-    "#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161", 
+    "#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161",
     "#fbafe4", "#949494", "#ece133", "#56b4e9"
 ]
 
+
 def use(styles):
     """
-    Function calling ``plt.style.use`` for easier access to the custom 
+    Function calling ``plt.style.use`` for easier access to the custom
     AGE matplotlib style sheets.
 
     Note
     ----
-    All style rcParams are reset to the matplotlib default before 
+    All style rcParams are reset to the matplotlib default before
     loading the specified styles.
 
     Warning
     -------
-    Compatibility between styles is not guaranteed. 
+    Compatibility between styles is not guaranteed.
 
     Parameters
     ----------
     styles: str or list of string
-        Styles to be loaded using ``plt.style.use``. Available styles 
-        can be viewed by calling ``ageplot.age_styles`` and 
+        Styles to be loaded using ``plt.style.use``. Available styles
+        can be viewed by calling ``ageplot.age_styles`` and
         ``ageplot.mpl_styles``.
 
     Example
@@ -58,21 +59,21 @@ def use(styles):
             raise ValueError(styles + " is not an available style.")
     else:
         raise TypeError("Expected str or list of strings specifying styles.")
-    
-    plt.style.use("default") # reset rcParams before applying the style
-    plt.style.use(load_styles) # apply the selected styles
+
+    plt.style.use("default")  # reset rcParams before applying the style
+    plt.style.use(load_styles)  # apply the selected styles
 
 
 class figsize():
     """
-    This class provides access to the width and height of the available 
-    space in different media in order to choose a figure size for 
+    This class provides access to the width and height of the available
+    space in different media in order to choose a figure size for
     matplotlib plots.
 
     Parameters
     ----------
     medium: str, optional
-        Name of the medium. Media, for which the size is 
+        Name of the medium. Media, for which the size is
         implemented, can be viewed with ``figsize.media``. Default: None
 
     Example
@@ -92,12 +93,12 @@ class figsize():
     """
 
     # (textwidth, textheight)
-    # If the journal uses multiple columns, columnwidth instead of 
-    # textwidth is used. 
+    # If the journal uses multiple columns, columnwidth instead of
+    # textwidth is used.
     _pagesizes = {
         "pccp": (3.54, 9.54),
-        "powerpoint": (5, 5.625), # 0.5 of full width
-        "latexbeamer": (2.766, 3.264) # 0.5 of full width
+        "powerpoint": (5, 5.625),  # 0.5 of full width
+        "latexbeamer": (2.766, 3.264)  # 0.5 of full width
     }
     media = list(_pagesizes.keys())
 
@@ -110,7 +111,7 @@ class figsize():
             self._w = self._pagesizes[medium][0]
             self._h = self._pagesizes[medium][0] * 0.75
             self._hmax = self._pagesizes[medium][1]
-        
+
         self._wh = (self._w, self._h)
 
     @property
@@ -125,7 +126,7 @@ class figsize():
     @property
     def h(self):
         """
-        Recommended height corresponding to the width 
+        Recommended height corresponding to the width
         (width * 3 / 4).
 
         """
@@ -139,7 +140,7 @@ class figsize():
         Note
         ----
         If there is a corresponding style sheet, the default figure
-        size will be set to (w, h) by ``ageplot.use()``. 
+        size will be set to (w, h) by ``ageplot.use()``.
 
         """
         return self._wh
@@ -151,3 +152,4 @@ class figsize():
 
         """
         return self._hmax
+        
