@@ -2,9 +2,9 @@ agepy
 =====
 
 .. image:: https://img.shields.io/badge/version-0.1.dev1-blue
-   :alt: Static Badge
+   :target: https://img.shields.io/badge/version-0.1.dev1-blue
 .. image:: https://img.shields.io/badge/License-MIT-blue
-   :alt: Static Badge
+   :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
 
 
 Installation
