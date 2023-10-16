@@ -35,7 +35,7 @@ also might not work.
 Contributing
 ------------
 
-In the documentation is a section on how to contribute.
+In the `documentation`_ is a section on how to contribute.
 
 Contributions to this package DO NOT grant co-authorship rights to any
 papers written in the AGE.
