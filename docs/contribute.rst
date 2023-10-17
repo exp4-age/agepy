@@ -22,6 +22,10 @@ How to contribute
 
     git clone https://github.com/exp4-age/agepy.git
 
+   .. note::
+
+    If you are new to *git*, checkout the short :doc:`git`.
+
 2. The `agepy`_ repository is protected, which means that you can't push
    any changes to it. Therefore, create a *Fork* of the *agepy* 
    repository. This creates your own copy of the repository, which is 
@@ -71,6 +75,10 @@ How to contribute
         If you are using the *Anaconda Navigator* go to your 
         environments, choose / create an environment, click on the play
         button and select *Open Terminal* and run the command.
+
+    .. note::
+
+        Here is a short introduction on :doc:`venv` and specificaly *venv*. 
 
 5. The repository has a *main* branch and a *develop* branch.
    The *main* branch should always contain the latest stable version of 
