@@ -19,8 +19,8 @@ How to contribute
 -----------------
 
 1. The agepy repository is protected, which means that you can't push
-   any changes to it. Therefore, create a *Fork* of the agepy 
-   repository. This creates your own *copy* of the repository, which is 
+   any changes to it. Therefore, create a *Fork* of the `agepy`_ 
+   repository. This creates your own copy of the repository, which is 
    linked to the original. In order to do this click 
    **Create a new fork**
 
