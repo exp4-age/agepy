@@ -1,3 +1,18 @@
+"""Plotting module containing custom AGE matplotlib styles and functions
+for creating nice plots. 
+
+Attributes
+----------
+age_styles: list
+    List of strings containing all the available custom AGE style 
+    sheets.
+mpl_styles: list
+    List of strings containing all the available matplotlib style 
+    sheets.
+colors: list
+    List of AGE colors (taken from the seaborn colorblind palette). 
+"""
+
 import matplotlib.pyplot as plt
 
 age_styles = ["age", "pccp", "powerpoint", "latexbeamer"]
@@ -11,28 +26,27 @@ colors = [
 
 
 def use(styles):
-    """
-    Function calling ``plt.style.use`` for easier access to the custom
-    AGE matplotlib style sheets.
+    """Function calling :py:func:`plt.style.use` for easier access to 
+    the custom AGE matplotlib style sheets.
 
-    Note
-    ----
+    Notes
+    -----
     All style rcParams are reset to the matplotlib default before
     loading the specified styles.
 
-    Warning
-    -------
+    Warnings
+    --------
     Compatibility between styles is not guaranteed.
 
     Parameters
     ----------
     styles: str or list of string
-        Styles to be loaded using ``plt.style.use``. Available styles
-        can be viewed by calling ``ageplot.age_styles`` and
-        ``ageplot.mpl_styles``.
+        Styles to be loaded using :py:func:`plt.style.use`. Available styles
+        can be viewed by calling :py:data:`ageplot.age_styles` and
+        :py:data:`ageplot.mpl_styles`.
 
-    Example
-    -------
+    Examples
+    --------
     How to use the AGE style:
 
     >>> from agepy import ageplot
@@ -65,7 +79,8 @@ def use(styles):
 
 
 class figsize():
-    """
+    """Class for choosing the appropriate size of matplotlib figures.
+    
     This class provides access to the width and height of the available
     space in different media in order to choose a figure size for
     matplotlib plots.
@@ -74,10 +89,26 @@ class figsize():
     ----------
     medium: str, optional
         Name of the medium. Media, for which the size is
-        implemented, can be viewed with ``figsize.media``. Default: None
+        implemented, can be viewed with :py:attr:`figsize.media`. 
+        Default: None
 
-    Example
-    -------
+    Attributes
+    ----------
+    w: float
+        Recommended width for a figure. Most of the time this will be
+        equivalent to the full available width.
+    h: float
+        Recommended height corresponding to the width 
+        (width * 3 / 4).
+    wh: tuple
+        Tuple (w, h) containing the width and recommended height.
+        If there is a corresponding style sheet, the default figure
+        size will be set to (w, h) by :py:func:`ageplot.use`.
+    hmax: float
+        Height in inches available for a figure.
+
+    Examples
+    --------
     A simple example for the PCCP journal:
 
     >>> from agepy import ageplot
@@ -104,51 +135,20 @@ class figsize():
 
     def __init__(self, medium=None):
         if medium is None:
-            self._w = 6.4
-            self._h = 4.8
-            self._hmax = None
+            self.w = 6.4
+            self.h = 4.8
+            self.hmax = None
         else:
-            self._w = self._pagesizes[medium][0]
-            self._h = self._pagesizes[medium][0] * 0.75
-            self._hmax = self._pagesizes[medium][1]
+            self.w = self._pagesizes[medium][0]
+            self.h = self._pagesizes[medium][0] * 0.75
+            self.hmax = self._pagesizes[medium][1]
 
-        self._wh = (self._w, self._h)
-
-    @property
-    def w(self):
-        """
-        Recommended width for a figure. Most of the time this will be
-        equivalent to the full available width.
-
-        """
-        return self._w
+        self.wh = (self.w, self.h)
 
     @property
-    def h(self):
-        """
-        Recommended height corresponding to the width
-        (width * 3 / 4).
+    def media(self):
+        """Class wide attribute containing a list of media, for which 
+        the figsize is implemented.
 
         """
-        return self._h
-
-    @property
-    def wh(self):
-        """
-        Tuple (w, h) containing the width and recommended height.
-
-        Note
-        ----
-        If there is a corresponding style sheet, the default figure
-        size will be set to (w, h) by ``ageplot.use()``.
-
-        """
-        return self._wh
-
-    @property
-    def hmax(self):
-        """
-        Height in inches available for a figure.
-
-        """
-        return self._hmax
+        return self.media

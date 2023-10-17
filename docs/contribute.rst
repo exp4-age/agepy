@@ -18,8 +18,12 @@ discussions about already implemented code.
 How to contribute
 -----------------
 
-1. The agepy repository is protected, which means that you can't push
-   any changes to it. Therefore, create a *Fork* of the `agepy`_ 
+1. Clone the `agepy`_ repository to your PC::
+
+    git clone https://github.com/exp4-age/agepy.git
+
+2. The `agepy`_ repository is protected, which means that you can't push
+   any changes to it. Therefore, create a *Fork* of the *agepy* 
    repository. This creates your own copy of the repository, which is 
    linked to the original. In order to do this click 
    **Create a new fork**
@@ -27,16 +31,14 @@ How to contribute
     .. image:: _static/create_fork_1.png
         :width: 800
 
-   on the `agepy`_ GitHub page and then **Create fork**
+   on the `agepy`_ GitHub page and then **Create fork** after removing 
+   the checkmark from the **Copy the main branch only** option.
 
     .. image:: _static/create_fork_2.png
         :width: 800
 
-2. Clone the original repository to your PC::
-
-    git clone https://github.com/exp4-age/agepy.git
-
-3. Move into the new agepy directory and add your fork as a remote ::
+3. Move into the new agepy directory on your PC created in the first 
+   step and add your fork as a remote ::
 
     git remote add <username> https://github.com/<username>/agepy.git
 
@@ -54,9 +56,8 @@ How to contribute
         name for the remote and you could give it a different name that
         makes sense to you. 
 
-4. In order to test the code you write, setup a virtual python 
-   environment (conda, venv, ...) and install the agepy package in 
-   editable mode::
+4. Setup a virtual python environment (conda, venv, ...) and install the 
+   agepy package in editable mode::
 
     pip install -e path/to/agepy
 
@@ -69,9 +70,16 @@ How to contribute
 
         If you are using the *Anaconda Navigator* go to your 
         environments, choose / create an environment, click on the play
-        button and select ``Open Terminal`` and run the command.
+        button and select *Open Terminal* and run the command.
 
-5. Once you have implemented your changes / new code, you can follow
+5. The repository has a *main* branch and a *develop* branch.
+   The *main* branch should always contain the latest stable version of 
+   the package. So before you make any changes and write code, you
+   should checkout the *develop* branch with ::
+
+    git checkout develop
+
+6. Once you have implemented your changes / new code, you can follow
    the usual git workflow by adding the changes ::
 
     git add -A
@@ -82,15 +90,22 @@ How to contribute
 
    pulling updates from the original repository ::
 
-    git pull origin main
+    git pull origin develop
+
+   .. note::
+
+    If the changes, that you are pulling from the original 
+    repository, are not in conflict with your changes, you can use
+    the ``--rebase`` option to apply your changes on top of them.
+    If there are conflicts, you will have to merge them.
 
    merging them if necessary and then pushing to your *Fork* with ::
 
-    git push <username> main
+    git push <username> develop
 
-6. The changes are now only on your *Fork* and not in the original
+7. The changes are now only on your *Fork* and not in the original
    repository yet. But now you can open a *Pull request* from your 
-   forked repository by clicking on *Contribute* and then 
+   forked repository on GitHub by clicking on *Contribute* and then 
    *Open pull request*:
 
     .. image:: _static/pull_request.png
@@ -98,33 +113,48 @@ How to contribute
 
    You can then write a few sentences about what you did and open
    the pull request. Everyone can then discuss the changes, suggest / 
-   make corrections and finally approve the pull_request. The pull
-   request will then get merged by an owner / maintainer.
+   make corrections and finally approve the *Pull request*. The *Pull
+   request* will then get merged by an owner / maintainer.
 
 8. In order to sync your fork with the now updated origin, you can ::
 
-    git pull --rebase origin main
+    git pull --rebase origin develop
 
-* If you messed up somewhere and just want to reset your local and
-  forked main branch to the version at origin/main, you can do ::
+.. note::
 
-    git reset --hard origin/main
+    If you want to return your installation to the stable version, just
+    checkout the *main* branch ::
 
-  and ::
+        git checkout main
 
-    git push --force <username> main
+    and pull any updates with ::
 
-  .. warning::
+        git pull origin main
 
-    This will delete any commits on your main branch that are ahead 
-    of origin/main. 
+.. note::
+
+    If you messed up somewhere and just want to reset your local and
+    forked main branch to the version at origin/main, you can do ::
+
+        git reset --hard origin main
+
+    and ::
+
+        git push --force <username> main
+
+    You can do the same with the *develop* branch instead of *main*.
+
+    .. warning::
+
+        This will delete any commits on your main branch that are ahead 
+        of origin/main. 
 
 
 Style guide
 -----------
 
 When writing code for the package, the style should match that of the 
-the other code in the package.
+the already existing code and should generally be easily readable.
 
 Some guidelines are listed here:
 
@@ -144,7 +174,7 @@ Writing docstrings
 ------------------
 
 For improved legibility, docstrings are parsed using the 
-`sphinx.ext.napoleon`_ extension. This means that the docstrings can and
+`numpydoc`_ extension. This means that the docstrings can and
 should be written in the same syntax used by *NumPy*::
 
     def func(arg1, arg2):
@@ -169,26 +199,21 @@ should be written in the same syntax used by *NumPy*::
 
 .. note::
 
-    The napoleon extension also supports Google style docstrings, but
-    for consistency only the NumPy style should / can be used here!
-
-.. note::
-
     The docstring needs to have an empty line at the end!
 
 There are more sections that can be included in the docstring like
-**Warning**, **Raises**, **Example**, etc. 
-(see full list in `sphinx.ext.napoleon`_).
+**Warnings**, **Raises**, **References**, **Examples**, etc. 
+(see full list in `numpydoc`_).
 
-Especially the **Example** section can be quite helpful by showcasing
+Especially the **Examples** section can be quite helpful by showcasing
 how the function might be used::
 
     def func(arg1, arg2):
         """
         ...
 
-        Example
-        -------
+        Examples
+        --------
         Explanation of what is happening.
 
         >>> from agepy.plot import func
@@ -199,7 +224,7 @@ how the function might be used::
 
 The resulting section will look like this:
 
-**Example**
+**Examples**
     
 Explanation of what is happening.
 
@@ -214,12 +239,12 @@ notebooks and added to the tutorials section.
 Writing tutorials
 -----------------
 
-Tutorials can be written in the form of `Jupyter Notebook`_s in the 
-``docs/_notebooks/`` directory.
+Tutorials can be written in the form of a `Jupyter Notebook`_ in 
+the ``docs/_notebooks/`` directory.
     
 
 .. _agepy: https://github.com/exp4-age/agepy
 .. _Syncing a fork: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line
-.. _sphinx.ext.napoleon: https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+.. _numpydoc: https://numpydoc.readthedocs.io/en/latest/format.html
 .. _PEP 8: https://peps.python.org/pep-0008/
 .. _Jupyter Notebook: https://jupyter-notebook.readthedocs.io/en/latest/

@@ -17,8 +17,8 @@ author = "Adrian Peter Krone"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
+    "numpydoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.autosummary",
     "sphinx_copybutton",
@@ -30,8 +30,10 @@ extensions = [
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-napoleon_google_docstring = False
-napoleon_include_init_with_doc = True
+numpydoc_show_class_members = False
+numpydoc_xref_param_type = True
+
+autosummary_generate = ["reference"]
 
 copybutton_prompt_text = ">>> "
 

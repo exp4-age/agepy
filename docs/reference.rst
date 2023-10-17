@@ -1,9 +1,15 @@
 Reference
 =========
 
-Here will be the documentation of all the functions / classes.
+All *agepy* modules and their classes, functions and attributes are
+listed and documented here.
 
-.. toctree::
-   :maxdepth: 1
+.. currentmodule:: agepy
+
+.. autosummary::
+   :nosignatures:
+   :recursive:
+   :template: agepy_module.rst
+   :toctree: _reference
 
    agepy.ageplot
