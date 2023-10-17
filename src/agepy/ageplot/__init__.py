@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 age_styles = ["age", "pccp", "powerpoint", "latexbeamer"]
 mpl_styles = ["default"]
-mpl_styles.append(plt.style.available)
+mpl_styles.extend(plt.style.available)
 
 colors = [
     "#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161",
@@ -152,4 +152,3 @@ class figsize():
 
         """
         return self._hmax
-        
