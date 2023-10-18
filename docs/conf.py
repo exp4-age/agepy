@@ -13,14 +13,25 @@ release = f"{version}"
 copyright = "2023, Adrian Peter Krone and AGE"
 author = "Adrian Peter Krone"
 
+rst_epilog = """
+
+.. |versionshield| image:: https://img.shields.io/badge/version-{}-blue
+   :target: https://img.shields.io/badge/version-{}-blue
+.. |licenseshield| image:: https://img.shields.io/badge/License-MIT-blue
+   :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
+.. |testshield| image:: https://github.com/exp4-age/agepy/actions/workflows/test.yml/badge.svg?branch=develop
+   :target: https://github.com/exp4-age/agepy/tree/develop
+
+""".format(version, version)
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     "sphinx.ext.autodoc",
     "numpydoc",
-    "sphinx.ext.mathjax",
     "sphinx.ext.autosummary",
+    "sphinx.ext.mathjax",
     "sphinx_copybutton",
     "matplotlib.sphinxext.plot_directive",
     "IPython.sphinxext.ipython_console_highlighting",

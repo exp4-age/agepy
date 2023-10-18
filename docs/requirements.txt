@@ -1,0 +1,28 @@
+# Sphinx https://pypi.org/project/Sphinx/
+Sphinx
+
+# nbsphinx https://pypi.org/project/nbsphinx/
+# Turns Jupyter Notebooks into documentation
+nbsphinx
+
+# numpydoc https://pypi.org/project/numpydoc/
+# Supports numpy style docstrings
+numpydoc
+
+# sphinx-rtd-theme https://pypi.org/project/sphinx-rtd-theme/
+# The Read the docs theme
+sphinx-rtd-theme
+
+# sphinx-copybutton https://pypi.org/project/sphinx-copybutton/
+# Adds a copybutton to code blocks
+sphinx-copybutton
+
+# sphinx-argparse https://pypi.org/project/sphinx-argparse/
+# Creates documentation for python scripts that use argparse
+sphinx-argparse
+
+# ipython https://pypi.org/project/ipython/
+ipython
+
+# matplotlib https://pypi.org/project/matplotlib/
+matplotlib >= 3.7

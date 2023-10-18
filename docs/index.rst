@@ -1,12 +1,7 @@
 agepy
 =====
 
-.. image:: https://img.shields.io/badge/version-0.2.0-blue
-   :target: https://img.shields.io/badge/version-0.2.0-blue
-.. image:: https://img.shields.io/badge/License-MIT-blue
-   :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
-.. image:: https://github.com/exp4-age/agepy/actions/workflows/test.yml/badge.svg
-   :target: https://github.com/exp4-age/agepy
+|versionshield| |licenseshield| |testshield|
 
 *agepy* is the python package of the Arbeitsgruppe Ehresmann, which ...
 
