@@ -106,6 +106,9 @@ class figsize():
         size will be set to (w, h) by :py:func:`ageplot.use`.
     hmax: float
         Height in inches available for a figure.
+    media: list
+        Class wide attribute containing a list of media, for which 
+        the figsize is implemented.
 
     Examples
     --------
@@ -144,11 +147,3 @@ class figsize():
             self.hmax = self._pagesizes[medium][1]
 
         self.wh = (self.w, self.h)
-
-    @property
-    def media(self):
-        """Class wide attribute containing a list of media, for which 
-        the figsize is implemented.
-
-        """
-        return self.media
