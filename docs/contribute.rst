@@ -85,7 +85,7 @@ How to contribute
    the package. So before you make any changes and write code, you
    should checkout the *develop* branch with ::
 
-    git checkout develop
+    git switch -c develop origin/develop
 
 6. Once you have implemented your changes / new code, you can follow
    the usual git workflow by adding the changes ::
