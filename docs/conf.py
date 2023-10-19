@@ -21,6 +21,8 @@ rst_epilog = """
    :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
 .. |testshield| image:: https://github.com/exp4-age/agepy/actions/workflows/test.yml/badge.svg?branch=develop
    :target: https://github.com/exp4-age/agepy/tree/develop
+.. |docsshield| image:: https://github.com/exp4-age/agepy/actions/workflows/docs.yml/badge.svg?branch=develop
+   :target: http://141.51.197.64:9001
 
 """.format(version, version)
 
