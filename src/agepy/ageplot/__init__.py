@@ -1,16 +1,16 @@
 """Plotting module containing custom AGE matplotlib styles and functions
-for creating nice plots. 
+for creating nice plots.
 
 Attributes
 ----------
 age_styles: list
-    List of strings containing all the available custom AGE style 
+    List of strings containing all the available custom AGE style
     sheets.
 mpl_styles: list
-    List of strings containing all the available matplotlib style 
+    List of strings containing all the available matplotlib style
     sheets.
 colors: list
-    List of AGE colors (taken from the seaborn colorblind palette). 
+    List of AGE colors (taken from the seaborn colorblind palette).
 
 """
 
@@ -27,7 +27,7 @@ colors = [
 
 
 def use(styles):
-    """Function calling :py:func:`plt.style.use` for easier access to 
+    """Function calling :py:func:`plt.style.use` for easier access to
     the custom AGE matplotlib style sheets.
 
     Notes
@@ -84,7 +84,7 @@ def use(styles):
 
 class figsize():
     """Class for choosing the appropriate size of matplotlib figures.
-    
+
     This class provides access to the width and height of the available
     space in different media in order to choose a figure size for
     matplotlib plots.
@@ -93,7 +93,7 @@ class figsize():
     ----------
     medium: str, optional
         Name of the medium. Media, for which the size is
-        implemented, can be viewed with :py:attr:`figsize.media`. 
+        implemented, can be viewed with :py:attr:`figsize.media`.
         Default: None
 
     Attributes
@@ -102,7 +102,7 @@ class figsize():
         Recommended width for a figure. Most of the time this will be
         equivalent to the full available width.
     h: float
-        Recommended height corresponding to the width 
+        Recommended height corresponding to the width
         (width * 3 / 4).
     wh: tuple
         Tuple (w, h) containing the width and recommended height.
@@ -111,7 +111,7 @@ class figsize():
     hmax: float
         Height in inches available for a figure.
     media: list
-        Class wide attribute containing a list of media, for which 
+        Class wide attribute containing a list of media, for which
         the figsize is implemented.
 
     Examples
