@@ -23,12 +23,15 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
+    - name: Set up pandoc
+      uses: r-lib/actions/setup-pandoc@v1
+      with:
+        pandoc-version: "2.9"
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r docs/requirements.txt
         python -m pip install .
-        conda install -c conda-forge pandoc
     - name: Run Sphinx make
       run: |
         cd docs
