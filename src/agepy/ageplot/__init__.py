@@ -11,6 +11,7 @@ mpl_styles: list
     sheets.
 colors: list
     List of AGE colors (taken from the seaborn colorblind palette). 
+
 """
 
 import matplotlib.pyplot as plt
@@ -47,10 +48,13 @@ def use(styles):
 
     Examples
     --------
-    How to use the AGE style:
+    How to use the AGE style in conjunction with a style setting the
+    figuresize, fontsizes and linewidths:
 
+    >>> import matplotlib.pyplot as plt
     >>> from agepy import ageplot
-    >>> ageplot.use("age")
+    >>> ageplot.use(["age", "pccp"])
+    >>> plt.plot([1, 2, 3], [4, 5, 6])
 
     """
     load_styles = []
@@ -122,7 +126,8 @@ class figsize():
     This could be used for a matplotlib plot like this:
 
     >>> import matplotlib.pyplot as plt
-    >>> fig, ax = plt.subplots(figsize=my_figsize.hw)
+    >>> fig, ax = plt.subplots(1, figsize=(my_figsize.w, my_figsize.hmax / 3))
+    >>> plt.plot([1, 2, 3], [4, 5, 6])
 
     """
 

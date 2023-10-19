@@ -43,6 +43,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 numpydoc_show_class_members = False
 numpydoc_xref_param_type = True
+numpydoc_use_plots = True
+
+plot_include_source = True
+plot_html_show_source_link = False
+plot_formats = [("hires.png", 300)]
+plot_html_show_formats = False
 
 autosummary_generate = ["reference"]
 

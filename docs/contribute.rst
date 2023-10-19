@@ -32,14 +32,14 @@ How to contribute
    linked to the original. In order to do this click 
    **Create a new fork**
 
-    .. image:: _static/create_fork_1.png
-        :width: 800
+   .. image:: _static/create_fork_1.png
+    :width: 800
 
    on the `agepy`_ GitHub page and then **Create fork** after removing 
    the checkmark from the **Copy the main branch only** option.
 
-    .. image:: _static/create_fork_2.png
-        :width: 800
+   .. image:: _static/create_fork_2.png
+    :width: 800
 
 3. Move into the new agepy directory on your PC created in the first 
    step and add your fork as a remote ::
@@ -54,11 +54,11 @@ How to contribute
    Insert your GitHub username into <username>, so that you can 
    *push* and *pull* to / from your *Fork*.
 
-    .. note::
+   .. note::
 
-        The <username> directly after ``git remote add`` is just the 
-        name for the remote and you could give it a different name that
-        makes sense to you. 
+    The <username> directly after ``git remote add`` is just the 
+    name for the remote and you could give it a different name that
+    makes sense to you. 
 
 4. Setup a virtual python environment (conda, venv, ...) and install the 
    agepy package in editable mode::
@@ -70,15 +70,15 @@ How to contribute
    local git repository and any changes you make will be immediately
    present, when you want to test / debug them.
 
-    .. note::
+   .. note::
 
-        If you are using the *Anaconda Navigator* go to your 
-        environments, choose / create an environment, click on the play
-        button and select *Open Terminal* and run the command.
+    If you are using the *Anaconda Navigator* go to your 
+    environments, choose / create an environment, click on the play
+    button and select *Open Terminal* and run the command.
 
-    .. note::
+   .. note::
 
-        Here is a short introduction on :doc:`venv` and specificaly *venv*. 
+    Here is a short introduction on :doc:`venv` and specificaly *venv*. 
 
 5. The repository has a *main* branch and a *develop* branch.
    The *main* branch should always contain the latest stable version of 
@@ -86,6 +86,14 @@ How to contribute
    should checkout the *develop* branch with ::
 
     git switch -c develop origin/develop
+
+   .. note::
+
+    It might be useful to assign yourself to an open *Issue* on GitHub
+    before you start working on implementing something. If there is no
+    *Issue* on the topic, then you can open one yourself. This will
+    signal to others that you are working on this topic. Once you open
+    a *Pull request*, you can link to the *Issue*. 
 
 6. Once you have implemented your changes / new code, you can follow
    the usual git workflow by adding the changes ::
