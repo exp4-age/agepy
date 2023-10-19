@@ -29,3 +29,6 @@ notebook
 
 # matplotlib https://pypi.org/project/matplotlib/
 matplotlib >= 3.7
+
+# scipy https://pypi.org/project/scipy/
+scipy
