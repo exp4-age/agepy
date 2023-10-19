@@ -24,5 +24,8 @@ sphinx-argparse
 # ipython https://pypi.org/project/ipython/
 ipython
 
+# jupyter notebook https://pypi.org/project/notebook/
+notebook
+
 # matplotlib https://pypi.org/project/matplotlib/
 matplotlib >= 3.7
