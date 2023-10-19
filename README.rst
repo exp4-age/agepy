@@ -7,6 +7,8 @@ agepy
    :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
 .. image:: https://github.com/exp4-age/agepy/actions/workflows/test.yml/badge.svg?branch=develop
    :target: https://github.com/exp4-age/agepy/tree/develop
+.. image:: https://github.com/exp4-age/agepy/actions/workflows/docs.yml/badge.svg?branch=develop
+   :target: http://141.51.197.64:9001
 
 
 Installation
