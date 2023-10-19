@@ -30,6 +30,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install -r docs/requirements.txt
         python -m pip install .
+        conda install -c conda-forge pandoc
     - name: Run Sphinx make
       run: |
         cd docs
