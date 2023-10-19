@@ -183,6 +183,12 @@ Some guidelines are listed here:
     * Maximum line length for docstrings / comments: 72 characters
     * ...
 
+  .. note::
+
+    You can use `flake8`_ to lint your code. It will list all places in
+    your code that don't conform to the style and tell you what the
+    problem is.
+
 * Provide a comment for every important line in your code.
 
 
@@ -267,4 +273,5 @@ the ``docs/_notebooks/`` directory.
 .. _Syncing a fork: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line
 .. _numpydoc: https://numpydoc.readthedocs.io/en/latest/format.html
 .. _PEP 8: https://peps.python.org/pep-0008/
+.. _flake8: https://flake8.pycqa.org/en/latest/index.html#quickstart
 .. _Jupyter Notebook: https://jupyter-notebook.readthedocs.io/en/latest/
