@@ -232,7 +232,7 @@ how the function might be used::
         --------
         Explanation of what is happening.
 
-        >>> from agepy.plot import func
+        >>> from agepy.example import func
         >>> func(1, "Hello World")
         True
 
@@ -247,6 +247,10 @@ Explanation of what is happening.
 >>> from agepy.example import func
 >>> func(1, "Hello World")
 True
+
+If your example code contains the line 
+``import matplotlib.pyplot as plt``, you can create a plot in the
+example, which will then be present in the documentation.
 
 More comprehensive examples can be written in the form of Jupyter
 notebooks and added to the tutorials section.
