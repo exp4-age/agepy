@@ -27,6 +27,9 @@ ipython
 # jupyter notebook https://pypi.org/project/notebook/
 notebook
 
+# pandoc https://pypi.org/project/pandoc/
+pandoc
+
 # matplotlib https://pypi.org/project/matplotlib/
 matplotlib >= 3.7
 
