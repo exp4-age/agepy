@@ -107,7 +107,7 @@ class figsize():
     wh: tuple
         Tuple (w, h) containing the width and recommended height.
         If there is a corresponding style sheet, the default figure
-        size will be set to (w, h) by :py:func:`ageplot.use`.
+        size will be set to (w, h) by :py:func:`agepy.ageplot.use`.
     hmax: float
         Height in inches available for a figure.
     media: list
@@ -146,9 +146,11 @@ class figsize():
             self.w = 6.4
             self.h = 4.8
             self.hmax = None
-        else:
+        elif medium in media:
             self.w = self._pagesizes[medium][0]
             self.h = self._pagesizes[medium][0] * 0.75
             self.hmax = self._pagesizes[medium][1]
+        else:
+            raise ValueError(medium + " is not an available medium.")
 
         self.wh = (self.w, self.h)
