@@ -146,7 +146,7 @@ class figsize():
             self.w = 6.4
             self.h = 4.8
             self.hmax = None
-        elif medium in media:
+        elif medium in self.media:
             self.w = self._pagesizes[medium][0]
             self.h = self._pagesizes[medium][0] * 0.75
             self.hmax = self._pagesizes[medium][1]
