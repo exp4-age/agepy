@@ -2,17 +2,48 @@ Contribute
 ==========
 
 This is a tutorial on how to contribute to the package.
+**Please do take note of the Note boxes, as they can contain important
+information** and read the entire step before executing it.
 
 
-Why GitHub?
------------
+Tutorial (Coming soon)
+----------------------
 
-By using GitHub *Pull requests* collaboration on developing the package
-is nicely structured and allows an easy review of new code by multiple
-people to spot bugs, problems and compatibility issues. 
+There will be a hands-on tutorial on how to contribute to the package
+soon. Please try and complete the section on :ref:`Github` so that we
+won't loose too much time on that.
 
-The *Issues* tab on GitHub can serve as a place for suggestions and 
-discussions about already implemented code.
+Checklist of things to do before the tutorial:
+
+* Complete the :ref:`Github` section.
+* Bring a laptop or join the tutorial online.
+
+Bonus points:
+
+* Have a python virtual environment set up (conda, venv) (:doc:`venv`).
+* Have git installed (:doc:`git`).
+
+
+.. _Github:
+
+GitHub
+------
+
+`exp4-age`_ is the GitHub organization that hosts the `agepy`_ package.
+After becoming a member you could also put your own projects there and
+collaborate with your team. It should be possible to create repositories
+private to the organization.
+
+1. Create a GitHub account if you don't have one yet.
+   
+   .. note::
+
+    As ArVe mentioned in his group seminar talk, you can get a free
+    *GitHub Pro* account through the `GitHub Education`_ program, which
+    inlcudes access to the GitHub Copilot AI.
+
+2. Ask one of the owners / maintainers (currently AdKr) of the `agepy`_
+   repository to add you to the organization and send them your username.
 
 
 How to contribute
@@ -269,6 +300,8 @@ Tutorials can be written in the form of a `Jupyter Notebook`_ in
 the ``docs/_notebooks/`` directory.
     
 
+.. _exp4-age: https://github.com/exp4-age
+.. _GitHub Education: https://education.github.com/
 .. _agepy: https://github.com/exp4-age/agepy
 .. _Syncing a fork: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork#syncing-a-fork-branch-from-the-command-line
 .. _numpydoc: https://numpydoc.readthedocs.io/en/latest/format.html

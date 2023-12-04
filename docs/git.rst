@@ -9,15 +9,20 @@ This is a short introduction to *git*, which is copied from the
 Installation
 ------------
 
-* On Windows:
+* **On Windows:**
   There are several options for git under Windows. 
   The Windows PowerShell already supports git, so no installation is really 
-  needed. 
+  needed. To test if git is available, open a PowerShell and type ``git``
+  and press enter. If is not available, you can install it with winget::
+
+    winget install --id Git.Git -e --source winget
   
-  The official standard toolbox is available at https://git-scm.com/,
-  which gives you the "Git Bash". 
+  If you don't want to use the PowerShell, you can install the official
+  standard toolbox (https://git-scm.com/), which gives you the "Git Bash"
+  and "Git GUI". 
   
-* Linux has git installed on almost all distributions.
+* **Linux** has git installed on almost all distributions. If it is not installed
+  for some reason, take a look at https://git-scm.com/download/linux.
 
 Execute the commands ::
 
