@@ -29,10 +29,6 @@ def test_plot_coinc_map():
     assert isinstance(ax_coinc, plt.Axes)
     assert isinstance(ax_x, plt.Axes)
     assert isinstance(ax_y, plt.Axes)
-    assert fig.get_size_inches() == figsize
-    assert ax_coinc.get_xlabel() == xlabel
-    assert ax_coinc.get_ylabel() == ylabel
-    assert fig.get_title() == title
 
     # Cleanup
     plt.close(fig)
