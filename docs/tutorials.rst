@@ -7,3 +7,4 @@ Tutorials go here.
     :maxdepth: 1
 
     _notebooks/plotting
+    _notebooks/coincedence
