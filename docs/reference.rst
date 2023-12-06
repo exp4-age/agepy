@@ -13,3 +13,4 @@ listed and documented here.
    :toctree: _reference
 
    agepy.ageplot
+   agepy.spec
