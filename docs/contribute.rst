@@ -6,7 +6,7 @@ This is a tutorial on how to contribute to the package.
 information** and read the entire step before executing it.
 
 
-Tutorial (Coming soon)
+Tutorial (13.12.2023)
 ----------------------
 
 There will be a hands-on tutorial on how to contribute to the package
@@ -73,33 +73,31 @@ How to contribute
     :width: 800
 
 3. Move into the new agepy directory on your PC created in the first 
-   step and add your fork as a remote ::
+   step and add your fork as a remote, so that you can *push* and *pull*
+   to / from your *Fork*. Insert your GitHub username into ``<username>``
+   and the copied link (see image) into ``<link to your fork>``. ::
 
-    git remote add <username> https://github.com/<username>/agepy.git
+    git remote add <username> <link to your fork>
 
-   or ::
-
-    git remote add <username> git@github.com:adryyan/agepy.git
-
-   depending on how you set up your authentification on GitHub.
-   Insert your GitHub username into <username>, so that you can 
-   *push* and *pull* to / from your *Fork*.
+   .. image:: _static/clone_repo.png
+    :width: 800 
 
    .. note::
 
-    The <username> directly after ``git remote add`` is just the 
-    name for the remote and you could give it a different name that
-    makes sense to you. 
+    ``<username>`` is just the name for the remote and you could give it
+    a different name that makes sense to you.
 
 4. Setup a virtual python environment (conda, venv, ...) and install the 
    agepy package in editable mode::
 
-    pip install -e path/to/agepy
+    pip install -e <path/to/agepy>
 
-   Replace ``path/to/agepy`` with the path to your cloned repository.
+   Replace ``<path/to/agepy>`` with the path to your cloned repository.
    By doing this the package will be sourced from the code in your 
    local git repository and any changes you make will be immediately
-   present, when you want to test / debug them.
+   present, when you want to test / debug them. If you want to
+   build the documentation, then you also need to install the packages
+   in the ``docs/requirements.txt`` file.
 
    .. note::
 
@@ -109,14 +107,37 @@ How to contribute
 
    .. note::
 
-    Here is a short introduction on :doc:`venv` and specificaly *venv*. 
+    Here is a short introduction on :doc:`venv`. 
 
 5. The repository has a *main* branch and a *develop* branch.
    The *main* branch should always contain the latest stable version of 
-   the package. So before you make any changes and write code, you
-   should checkout the *develop* branch with ::
+   the package. When you contribute code, it will first be merged into
+   the *develop* branch and then at some point with other changes into
+   the *main* branch.
 
-    git switch -c develop origin/develop
+   If you want to switch between the *develop* and *main* version, you
+   can do so with ::
+
+    git switch <branch>
+
+   When you clone the repository, you only create a local *develop*
+   branch. To also create a local *main* branch, you can do ::
+
+    git switch -c main origin/main
+   
+   In theory you could work on the local *main* and *develop* branch,
+   but I suggest that you don't make any changes there and keep both
+   branches in sync with the *origin* repository, so that you can easily
+   return your installation to a functioning version. After switching
+   to the ``<branch>`` that you want to update, you can pull changes
+   with ::
+
+    git pull origin <branch>
+
+   So before you make any changes and write code, you should create a
+   new branch ::
+
+    git switch -c <name> origin/develop
 
    .. note::
 
@@ -133,7 +154,7 @@ How to contribute
 
    creating a commit ::
 
-    git commit -m "Some descriptive message"
+    git commit -m "<some descriptive message>"
 
    pulling updates from the original repository ::
 
@@ -148,7 +169,7 @@ How to contribute
 
    merging them if necessary and then pushing to your *Fork* with ::
 
-    git push <username> develop
+    git push <username>
 
 7. The changes are now only on your *Fork* and not in the original
    repository yet. But now you can open a *Pull request* from your 
@@ -159,42 +180,9 @@ How to contribute
         :width: 800
 
    You can then write a few sentences about what you did and open
-   the pull request. Everyone can then discuss the changes, suggest / 
+   the pull request. Everyone can then discuss the changes, suggest /
    make corrections and finally approve the *Pull request*. The *Pull
    request* will then get merged by an owner / maintainer.
-
-8. In order to sync your fork with the now updated origin, you can ::
-
-    git pull --rebase origin develop
-
-.. note::
-
-    If you want to return your installation to the stable version, just
-    checkout the *main* branch ::
-
-        git checkout main
-
-    and pull any updates with ::
-
-        git pull origin main
-
-.. note::
-
-    If you messed up somewhere and just want to reset your local and
-    forked main branch to the version at origin/main, you can do ::
-
-        git reset --hard origin main
-
-    and ::
-
-        git push --force <username> main
-
-    You can do the same with the *develop* branch instead of *main*.
-
-    .. warning::
-
-        This will delete any commits on your main branch that are ahead 
-        of origin/main. 
 
 
 Style guide
