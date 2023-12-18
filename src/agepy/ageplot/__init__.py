@@ -16,7 +16,7 @@ colors: list
 
 import matplotlib.pyplot as plt
 
-age_styles = ["age", "pccp", "powerpoint", "latexbeamer"]
+age_styles = ["age", "tex", "pccp", "powerpoint", "latexbeamer"]
 mpl_styles = ["default"]
 mpl_styles.extend(plt.style.available)
 
