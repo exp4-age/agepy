@@ -61,7 +61,7 @@ lines.markersize:      3.3      # marker size, in points
 font.family:  sans-serif
 font.size:    7
 
-font.sans-serif: Arial, Helvetica, DejaVu Sans, Computer Modern Sans Serif, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
+font.sans-serif: Helvetica, Arial, DejaVu Sans, Computer Modern Sans Serif, Bitstream Vera Sans, Lucida Grande, Verdana, Geneva, Lucid, Avant Garde, sans-serif
 
 
 ## ***************************************************************************
@@ -71,9 +71,10 @@ font.sans-serif: Arial, Helvetica, DejaVu Sans, Computer Modern Sans Serif, Bits
 ## https://matplotlib.org/stable/tutorials/text/usetex.html
 
 ## The following settings allow you to select the fonts in math mode.
-mathtext.fontset: dejavusans    # Should be 'dejavusans' (default),
-                                # 'dejavuserif', 'cm' (Computer Modern), 'stix',
-                                # 'stixsans' or 'custom'
+mathtext.fontset: custom  # Should be 'dejavusans' (default),
+                          # 'dejavuserif', 'cm' (Computer Modern), 'stix',
+                          # 'stixsans' or 'custom'
+mathtext.it: Helvetica:italic
 
 
 ## ***************************************************************************
