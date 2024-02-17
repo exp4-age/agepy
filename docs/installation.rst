@@ -1,20 +1,15 @@
 Installation
 ============
 
-Currently the *agepy* package is not yet distributed via conda or pip.
-
-However, you can install the package directly from the `GitHub`_ 
-repository with pip.
 If you have no intention of developing code yourself and just want quick
 access to the functions and programs, you can install with ::
 
-    pip install git+https://github.com/exp4-age/agepy.git
+    pip install exp4-agepy
 
-in your virtual environment. This will create a temporary clone of the 
-repository and build the package. If there is a new version in the
-GitHub repository, you can upgrade with ::
+in your virtual environment. If there is a new version, you can upgrade
+with ::
 
-    pip install git+https://github.com/exp4-age/agepy.git --upgrade
+    pip install exp4-agepy --upgrade
 
 .. note::
 
