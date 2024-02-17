@@ -1,6 +1,8 @@
 name: Publish Python 🐍 distribution 📦 to PyPI
 
-on: release
+on:
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -35,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/agepy
+      url: https://pypi.org/p/exp4-agepy
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing
 
