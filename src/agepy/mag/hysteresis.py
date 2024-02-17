@@ -2,6 +2,7 @@
 
 Currently only includes Faraday correction via analytic optimization.
 Faraday correction based on measured data can be added on request.
+
 """
 
 from typing import Sequence
@@ -42,6 +43,7 @@ def normalize(*magnetization: Sequence,
         one continous array, then a 1-D array with the same length is
         returned. If ``magnetization`` is two arrays, a 2-D array is
         returned containing the two branches in the first axis.
+
     """
 
     if len(magnetization) == 1:
@@ -94,6 +96,7 @@ def shift_branch(*magnetization: Sequence, shift_value: float) -> NDArray:
         one continous array, then a 1-D array with the same length is
         returned. If ``magnetization`` is two arrays, a 2-D array is
         returned containing the two branches in the first axis.
+
     """
 
     if len(magnetization) == 1:
@@ -163,6 +166,7 @@ def drift_correction(*hysteresis: ArrayLike, slope: float) -> NDArray:
     >>> hyst = array([[H1, M1], [H2, M2]])
     >>> drift_correction(*hyst, slope=10)
     array([[<M1-values>], [<M2-values>]])
+
     """
 
     if len(hysteresis) == 1:
@@ -236,6 +240,7 @@ def linear_correction(*hysteresis: ArrayLike,
     >>> hyst = array([[H1, M1], [H2, M2]])
     >>> linear_correction(*hyst, saturation_percentage=10)
     array([[<M1-values>], [<M2-values>]])
+
     """
 
     if len(hysteresis) == 1:
@@ -342,6 +347,7 @@ def faraday_correction(*hysteresis: ArrayLike,
     >>> faraday_correction(*hyst, initial_guess=(0.01, 5, 100),
                             saturation_percentage=10)
     array([[<M1-values>], [<M2-values>]])
+
     """
 
     if len(hysteresis) == 1:
@@ -371,6 +377,7 @@ def faraday_correction(*hysteresis: ArrayLike,
             verdet constant
         s: float
             left shift
+
         """
 
         return A * np.cos(v * (x + s) + np.pi/2)**2
@@ -380,6 +387,7 @@ def faraday_correction(*hysteresis: ArrayLike,
 
         Assumes the ideal correction is reached, when the saturation
         flattens out.
+
         """
 
         cos_squared = cos_sq(H, *x)
@@ -476,6 +484,7 @@ def optimized_faraday_correction(*hysteresis: ArrayLike,
     several times of that.
 
     The following example demonstrates a typical correction code.
+
     >>> M, H = ...
     >>> M = drift_correction((H, M), slope=0.2)
     >>> M = shift_branch(M, shift_value=5)
@@ -506,24 +515,26 @@ def optimized_faraday_correction(*hysteresis: ArrayLike,
     a clean hysteresis this last step is therefore necessary.
 
     Viable example inputs.
+
     >>> faraday_correction((H, M), verdet_guess=0.01, left_shift_guess=5,
-                            saturation_percentage=10)
+                           saturation_percentage=10)
     array([<M-values>])
 
     >>> faraday_correction((H1, M1), (H2, M2), verdet_guess=0.01,
-                            left_shift_guess=5,
-                            saturation_percentage=10)
+                           left_shift_guess=5,
+                           saturation_percentage=10)
     array([[<M1-values>], [<M2-values>]])
 
     >>> hyst = array([H, M])
     >>> faraday_correction(hyst, verdet_guess=0.01, left_shift_guess=5,
-                            saturation_percentage=10)
+                           saturation_percentage=10)
     array([<M-values>])
 
     >>> hyst = array([[H1, M1], [H2, M2]])
     >>> faraday_correction(*hyst, verdet_guess=0.01, left_shift_guess=5,
-                            saturation_percentage=10)
+                           saturation_percentage=10)
     array([[<M1-values>], [<M2-values>]])
+
     """
 
     if len(hysteresis) == 1:
@@ -545,6 +556,7 @@ def optimized_faraday_correction(*hysteresis: ArrayLike,
 
         Assumes the ideal correction is reached, when the saturation
         flattens out.
+
         """
 
         corrected = faraday_correction(

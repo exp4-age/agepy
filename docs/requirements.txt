@@ -1,3 +1,6 @@
+# agepy
+-e .
+
 # Sphinx https://pypi.org/project/Sphinx/
 Sphinx
 
@@ -21,14 +24,14 @@ sphinx-copybutton
 # Creates documentation for python scripts that use argparse
 sphinx-argparse
 
+# sphinx-autodoc-typehints https://pypi.org/project/sphinx-autodoc-typehints/
+sphinx-autodoc-typehints
+
+# pandoc https://pypi.org/project/pandoc/
+pandoc >= 2.3
+
 # ipython https://pypi.org/project/ipython/
 ipython
 
 # jupyter notebook https://pypi.org/project/notebook/
 notebook
-
-# matplotlib https://pypi.org/project/matplotlib/
-matplotlib >= 3.7
-
-# scipy https://pypi.org/project/scipy/
-scipy

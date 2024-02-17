@@ -33,6 +33,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "numpydoc",
     "sphinx.ext.autosummary",
+    "sphinx_autodoc_typehints",
     "sphinx.ext.mathjax",
     "sphinx_copybutton",
     "matplotlib.sphinxext.plot_directive",
@@ -40,10 +41,20 @@ extensions = [
     "nbsphinx",  # https://jupyter-tutorial.readthedocs.io/de/latest/sphinx/nbsphinx.html
 ]
 
+autosummary_imported_members = True
+autosummary_generate = True
+autoclass_content = "class"
+html_show_sourcelink = False
+set_type_checking_flag = True
+nbsphinx_allow_errors = True
+add_module_names = False
+
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 numpydoc_show_class_members = False
+numpydoc_show_inherited_class_members = False
+numpydoc_class_members_toctree = True
 numpydoc_xref_param_type = True
 numpydoc_use_plots = True
 

@@ -1,6 +1,10 @@
+"""Functions for working with coincidence maps.
+
+"""
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
+
 
 
 def plot_coinc_map(coincmap, xedges, yedges, figsize=None, cmap='YlOrRd',

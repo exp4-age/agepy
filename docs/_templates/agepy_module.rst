@@ -20,6 +20,7 @@
 
    .. autosummary::
       :toctree:
+      :nosignatures:
    {% for item in functions %}
       {{ item }}
    {%- endfor %}
@@ -32,6 +33,8 @@
 
    .. autosummary::
       :toctree:
+      :template: agepy_class.rst
+      :nosignatures:
    {% for item in classes %}
       {{ item }}
    {%- endfor %}
@@ -56,6 +59,7 @@
 
 .. autosummary::
    :toctree:
+   :template: agepy_module.rst
    :recursive:
 {% for item in modules %}
    {{ item }}

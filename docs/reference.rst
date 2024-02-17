@@ -12,5 +12,6 @@ listed and documented here.
    :template: agepy_module.rst
    :toctree: _reference
 
-   agepy.ageplot
-   agepy.spec
+   ageplot
+   spec
+   mag

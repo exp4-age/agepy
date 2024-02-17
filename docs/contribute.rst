@@ -6,26 +6,6 @@ This is a tutorial on how to contribute to the package.
 information** and read the entire step before executing it.
 
 
-Tutorial (13.12.2023)
-----------------------
-
-There will be a hands-on tutorial on how to contribute to the package
-soon. Please try and complete the section on :ref:`Github` so that we
-won't loose too much time on that.
-
-Checklist of things to do before the tutorial:
-
-* Complete the :ref:`Github` section.
-* Bring a laptop or join the tutorial online.
-
-Bonus points:
-
-* Have a python virtual environment set up (conda, venv) (:doc:`venv`).
-* Have git installed (:doc:`git`).
-
-
-.. _Github:
-
 GitHub
 ------
 
