@@ -20,10 +20,7 @@ Installation
 
 Install with ::
 
-    pip install git+https://github.com/exp4-age/agepy.git
-
-This will create a temporary clone of the repository and build the
-package in your environment.
+    pip install exp4-agepy
 
 If you want to help develop and contribute to the package, first clone
 the repository to your PC and install in editable mode (detailed 
