@@ -1,14 +1,18 @@
 agepy
 =====
 
-.. image:: https://img.shields.io/badge/version-0.2.0-blue
-   :target: https://img.shields.io/badge/version-0.2.0-blue
+.. image:: https://img.shields.io/badge/version-0.2.1-blue
+   :target: https://img.shields.io/badge/version-0.2.1-blue
 .. image:: https://img.shields.io/badge/License-MIT-blue
    :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
 .. image:: https://github.com/exp4-age/agepy/actions/workflows/test.yml/badge.svg?branch=develop
    :target: https://github.com/exp4-age/agepy/tree/develop
-.. image:: https://github.com/exp4-age/agepy/actions/workflows/docs.yml/badge.svg?branch=develop
-   :target: http://141.51.197.64:9001
+.. image:: https://readthedocs.org/projects/exp4-agepy/badge/?version=latest
+   :target: https://exp4-agepy.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+.. image:: https://img.shields.io/pypi/v/exp4-agepy
+   :target: https://pypi.org/project/exp4-agepy/
+   :alt: PyPI - Version
 
 
 Installation
@@ -31,9 +35,7 @@ tutorial in documentation)::
 Documentation
 -------------
 
-For now the `documentation`_ is only available from within the
-university network. It might work with the university vpn, but it
-also might not work.
+The `documentation`_ is now on *Read the docs*.
 
 
 Contributing
@@ -42,4 +44,4 @@ Contributing
 See `CONTRIBUTING.rst <CONTRIBUTING.rst>`_
 
 
-.. _documentation: http://141.51.197.64:9001
+.. _documentation: https://exp4-agepy.readthedocs.io/en/latest/

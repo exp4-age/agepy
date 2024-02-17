@@ -1,7 +1,7 @@
 agepy
 =====
 
-|versionshield| |licenseshield| |testshield| |docsshield|
+|versionshield| |licenseshield| |testshield| |docsshield| |pypi|
 
 *agepy* is the python package of the Arbeitsgruppe Ehresmann, which ...
 
