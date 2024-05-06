@@ -16,7 +16,8 @@ colors: list
 
 import matplotlib.pyplot as plt
 
-age_styles = ["age", "tex", "nature", "pccp", "powerpoint", "latexbeamer"]
+age_styles = ["age", "tex", "nature", "prl", "pccp", "powerpoint",
+              "latexbeamer"]
 mpl_styles = ["default"]
 mpl_styles.extend(plt.style.available)
 
@@ -140,6 +141,8 @@ class figsize():
         "latexbeamer": (2.766, 3.264),  # 0.5 of full width
         "nature2col": (180 / 25.4, 225 / 25.4),
         "nature1col": (88 / 25.4, 220 / 25.4),
+        "prl1col": (3.375, 8.7),
+        "prl2col": (3.375 * 1.5, 8.7),
     }
     media = list(_pagesizes.keys())
 
