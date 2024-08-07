@@ -1,8 +1,8 @@
 agepy
 =====
 
-.. image:: https://img.shields.io/badge/version-0.2.1-blue
-   :target: https://img.shields.io/badge/version-0.2.1-blue
+.. image:: https://img.shields.io/badge/version-0.2.2-blue
+   :target: https://img.shields.io/badge/version-0.2.2-blue
 .. image:: https://img.shields.io/badge/License-MIT-blue
    :target: https://github.com/exp4-age/agepy/blob/main/LICENSE
 .. image:: https://github.com/exp4-age/agepy/actions/workflows/test.yml/badge.svg?branch=develop
