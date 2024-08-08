@@ -255,6 +255,37 @@ class Spectrum:
 class EnergyScan:
     """Scan over exciting-photon energies.
 
+    Parameters
+    ----------
+    data_files: Sequence[str]
+        List of data files to be processed.
+    energies: str
+        Path to the exciting-photon energies in the data files.
+    anode: PositionAnode
+        Anode object from `agepy.spec.photons`.
+    raw: str, optional
+        Path to the raw data in the data files. Default:
+        "dld_rd#raw/0".
+    time_per_step: int, optional
+        Time per step in the scan. Default: None.
+    target_density: str, optional
+        Path to the target density in the data files. Default: None.
+    intensity_downstream: str, optional
+        Path to the downstream intensity in the data files. Default:
+        None.
+    intensity_upstream: str, optional
+        Path to the upstream intensity in the data files. Default:
+        None.
+
+    Attributes
+    ----------
+    anode: PositionAnode
+        Anode object from `agepy.spec.photons`.
+    spectra: np.ndarray
+        Array of the loaded Spectrum objects.
+    energies: np.ndarray
+        Array of the exciting-photon energies.
+
     TODO
     ----
     - Very minimal implementation, needs to be expanded
@@ -296,6 +327,21 @@ class EnergyScan:
     def counts(self,
         roi: dict = None,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Get the photon-excitation energy spectrum.
+
+        Parameters
+        ----------
+        roi: dict
+            Region of interest for the detector. If not provided, the
+            full detector is used.
+
+        Returns
+        -------
+        Tuple[np.ndarray, np.ndarray, np.ndarray]
+            The number of counts (normalized), the respective
+            statistical uncertainties, and the exciting-photon energies.
+
+        """
         vectorized_counts = np.vectorize(
             lambda spec: spec.counts(self.anode, roi=roi)
         )

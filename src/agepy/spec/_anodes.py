@@ -299,3 +299,16 @@ class Old_DldAnode(Old_PositionAnode):
         pos[:, 1] = (v - w) / 1.7321
 
         return super().process(pos)
+
+
+available_anodes = {
+    'poco': PocoAnode,
+    'wsa': WsaAnode,
+    'dld_xy': DldAnodeXY,
+    'dld_uvw': DldAnodeUVW,
+    'dld_uv': DldAnodeUV,
+    'dld_uw': DldAnodeUW,
+    'dld_vw': DldAnodeVW,
+    'old_wsa': Old_WsaAnode,
+    'old_dld': Old_DldAnode
+}
