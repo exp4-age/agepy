@@ -8,3 +8,4 @@ Tutorials go here.
 
     _notebooks/plotting
     _notebooks/coincedence
+    _notebooks/energy_scan

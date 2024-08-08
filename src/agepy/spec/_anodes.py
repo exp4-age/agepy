@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Union, Tuple, Sequence
+from typing import Union, Tuple
 import numpy as np
 
 
@@ -54,9 +54,6 @@ class PositionAnode(object):
 
 
 class WsaAnode(PositionAnode):
-    """Needs documentation.
-
-    """
 
     def __init__(self, angle, scale=(3, 3), offset=(0.8, 0.8),
                  scale_a=0.8, scale_b=0.65, scale_c=1.5,
@@ -84,18 +81,12 @@ class WsaAnode(PositionAnode):
 
 
 class PocoAnode(PositionAnode):
-    """Needs documentation.
-
-    """
 
     def __init__(self, angle):
         super().__init__(angle, (0.0005, 0.0005), (0, 0))
 
 
 class DldAnode(PositionAnode):
-    """DLD anode parent class.
-
-    """
 
     def __init__(self, angle):
         super().__init__(angle, (1e-05, 1e-05), (0, 0))
@@ -177,9 +168,6 @@ class DldAnodeUVW(DldAnode):
 
 
 class DldAnodeUV(DldAnode):
-    """Needs documentation.
-
-    """
 
     def process(self, rows):
         u = rows[:, 0] - rows[:, 1]
@@ -193,9 +181,6 @@ class DldAnodeUV(DldAnode):
 
 
 class DldAnodeUW(DldAnode):
-    """Needs documentation.
-
-    """
 
     def process(self, rows):
         u = rows[:, 0] - rows[:, 1]
@@ -209,9 +194,6 @@ class DldAnodeUW(DldAnode):
 
 
 class DldAnodeVW(DldAnode):
-    """Needs documentation.
-
-    """
 
     def process(self, rows):
         v = rows[:, 0] - rows[:, 1]
@@ -225,9 +207,6 @@ class DldAnodeVW(DldAnode):
 
 
 class Old_PositionAnode(PositionAnode):
-    """Needs documentation.
-
-    """
 
     def __init__(self, angle, scale, offset):
         self.transform = np.zeros((2,2), dtype=float)
@@ -252,9 +231,6 @@ class Old_PositionAnode(PositionAnode):
 
 
 class Old_WsaAnode(Old_PositionAnode):
-    """Needs documentation.
-
-    """
 
     def __init__(self, angle, scale=(2.65, 2.70), offset=(0.04, 0.06),
                  scale_a=0.80, scale_b=0.65, scale_c=1.50,
@@ -282,9 +258,6 @@ class Old_WsaAnode(Old_PositionAnode):
 
 
 class Old_DldAnode(Old_PositionAnode):
-    """Needs documentation.
-
-    """
 
     def __init__(self, angle):
         super().__init__(angle, (0.0005, 0.0005), (-1024, -1024))
