@@ -63,7 +63,7 @@ class Spectrum:
     @classmethod
     def from_scan(cls,
         file_path: str,
-        scan_var: str,
+        scan_var: str = None,
         raw: str = "dld_rd#raw/0",
         time_per_step: int = None,
         anode: PositionAnode = None,
@@ -73,30 +73,34 @@ class Spectrum:
     ) -> Tuple[list, list]:
         with h5py.File(file_path, "r") as h5:
             # Load the steps
-            steps = h5[scan_var]
+            if scan_var is not None:
+                steps = h5[scan_var]
             # Load the raw data
             raw = h5[raw]
             # Load the target density
             if target_density is not None:
                 target_density = np.asarray(h5[target_density])
             else:
-                target_density = np.full(len(steps), None)
+                target_density = np.full(len(raw), None)
             # Load upstream intensity
             if intensity_upstream is not None:
                 intensity_upstream = np.asarray(h5[intensity_upstream])
             else:
-                intensity_upstream = np.full(len(steps), None)
+                intensity_upstream = np.full(len(raw), None)
             # Load downstream intensity
             if intensity_downstream is not None:
                 intensity_downstream = np.asarray(h5[intensity_downstream])
             else:
-                intensity_downstream = np.full(len(steps), None)
+                intensity_downstream = np.full(len(raw), None)
             # Format the data and steps
             spectra = []
             step_val = []
-            for i, step in enumerate(steps.keys()):
+            for i, step in enumerate(raw.keys()):
                 # Format the step value
-                step_val.append(steps[step][0][0])
+                if scan_var is not None:
+                    step_val.append(steps[step][0][0])
+                else:
+                    step_val.append(float(step))
                 # Format the raw data
                 data = np.asarray(raw[step])
                 # Initialize the spectrum instance
@@ -262,10 +266,11 @@ class EnergyScan:
     ----------
     data_files: Sequence[str]
         List of data files to be processed.
-    energies: str
-        Path to the exciting-photon energies in the data files.
     anode: PositionAnode
         Anode object from `agepy.spec.photons`.
+    energies: str, optional
+        Path to the exciting-photon energies in the data files. If None,
+        the keys are used as the exciting-photon energies.
     raw: str, optional
         Path to the raw data in the data files. Default:
         "dld_rd#raw/0".
@@ -297,8 +302,8 @@ class EnergyScan:
 
     def __init__(self,
         data_files: Sequence[str],
-        energies: str,
         anode: PositionAnode,
+        energies: str = None,
         raw: str = "dld_rd#raw/0",
         time_per_step: int = None,
         target_density: str = None,
@@ -312,7 +317,7 @@ class EnergyScan:
             data_files = [data_files]
         for f in data_files:
             spec, E = Spectrum.from_scan(
-                f, energies, raw=raw, time_per_step=time_per_step,
+                f, scan_var=energies, raw=raw, time_per_step=time_per_step,
                 anode=None, target_density=target_density,
                 intensity_downstream=intensity_downstream,
                 intensity_upstream=intensity_upstream
