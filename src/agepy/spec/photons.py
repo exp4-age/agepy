@@ -9,6 +9,8 @@ import numpy as np
 import h5py
 
 from ._anodes import *
+from agepy.spec.interactive.photons import AGEScanViewer
+from agepy.interactive import AGEpp
 
 
 class Spectrum:
@@ -219,13 +221,13 @@ class Spectrum:
             a, b = phem_calib
             det_image = a * det_image + b
             # Adjust x roi filter to wavelength binning
-            wl_min = edges[edges < (a * roi["x"]["min"] + b)][-1]
-            wl_max = edges[edges > (a * roi["x"]["max"] + b)][0]
+            wl_min = edges[edges > (a * roi["x"]["min"] + b)][0]
+            wl_max = edges[edges < (a * roi["x"]["max"] + b)][-1]
             xroi = (det_image >= wl_min) & (det_image <= wl_max)
         else:
             # Adjust x roi filter to detector binning
-            x_min = edges[edges < roi["x"]["min"]][-1]
-            x_max = edges[edges > roi["x"]["max"]][0]
+            x_min = edges[edges > roi["x"]["min"]][0]
+            x_max = edges[edges < roi["x"]["max"]][-1]
             xroi = (det_image >= x_min) & (det_image <= x_max)
         # Apply x roi filter
         det_image = det_image[xroi]
@@ -259,8 +261,8 @@ class Spectrum:
         return spectrum, errors
 
 
-class EnergyScan:
-    """Scan over exciting-photon energies.
+class Scan:
+    """Scan over some variable with a spectrum for each step.
 
     Parameters
     ----------
@@ -268,9 +270,9 @@ class EnergyScan:
         List of data files to be processed.
     anode: PositionAnode
         Anode object from `agepy.spec.photons`.
-    energies: str, optional
-        Path to the exciting-photon energies in the data files. If None,
-        the keys are used as the exciting-photon energies.
+    scan_var: str, optional
+        Path to the step values in the data files. If None,
+        the keys are used as the values.
     raw: str, optional
         Path to the raw data in the data files. Default:
         "dld_rd#raw/0".
@@ -291,8 +293,8 @@ class EnergyScan:
         Anode object from `agepy.spec.photons`.
     spectra: np.ndarray
         Array of the loaded Spectrum objects.
-    energies: np.ndarray
-        Array of the exciting-photon energies.
+    steps: np.ndarray
+        Array of the scan variable values.
 
     TODO
     ----
@@ -303,7 +305,7 @@ class EnergyScan:
     def __init__(self,
         data_files: Sequence[str],
         anode: PositionAnode,
-        energies: str = None,
+        scan_var: str = None,
         raw: str = "dld_rd#raw/0",
         time_per_step: int = None,
         target_density: str = None,
@@ -312,25 +314,25 @@ class EnergyScan:
     ) -> None:
         self.anode = anode  
         self.spectra = []
-        self.energies = []
+        self.steps = []
         if isinstance(data_files, str):
             data_files = [data_files]
         for f in data_files:
-            spec, E = Spectrum.from_scan(
-                f, scan_var=energies, raw=raw, time_per_step=time_per_step,
+            spec, steps = Spectrum.from_scan(
+                f, scan_var=scan_var, raw=raw, time_per_step=time_per_step,
                 anode=None, target_density=target_density,
                 intensity_downstream=intensity_downstream,
                 intensity_upstream=intensity_upstream
             )
             self.spectra.extend(spec)
-            self.energies.extend(E)
+            self.steps.extend(steps)
         # Convert to numpy arrays
-        self.energies = np.array(self.energies)
+        self.steps = np.array(self.steps)
         self.spectra = np.array(self.spectra)
-        # Sort the spectra by energy
-        energy_sort = np.argsort(self.energies)
-        self.energies = self.energies[energy_sort]
-        self.spectra = self.spectra[energy_sort]
+        # Sort the spectra by step values
+        _sort = np.argsort(self.steps)
+        self.steps = self.steps[_sort]
+        self.spectra = self.spectra[_sort]
 
     def counts(self,
         roi: dict = None,
@@ -354,5 +356,57 @@ class EnergyScan:
             lambda spec: spec.counts(self.anode, roi=roi)
         )
         n, err = vectorized_counts(self.spectra)
-        return n, err, self.energies
+        return n, err, self.steps
+
+    def spectrum_at(self,
+        step: Union[int, float],
+        edges: np.ndarray,
+        roi: dict = None,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Get the spectrum at a specific step.
+
+        """
+        if step not in self.steps:
+            raise ValueError("Step value not found in scan.")
+        spec = self.spectra[self.steps == step]
+        if len(spec) > 1:
+            warnings.warn("Multiple spectra found for step value. "
+                          "Returning the first.")
+        spec = spec[0]
+        return spec.spectrum(edges, anode=self.anode, roi=roi)
+
+    def show_spectra(self):
+        """Plot the spectra in an interactive window.
+
+        """
+        app = AGEpp(AGEScanViewer, self)
+        app.run()
+
+
+class EnergyScan(Scan):
+    """
+    
+    """
+
+    def __init__(self,
+        data_files: Sequence[str],
+        anode: PositionAnode,
+        energies: str = None,
+        raw: str = "dld_rd#raw/0",
+        time_per_step: int = None,
+        target_density: str = None,
+        intensity_downstream: str = None,
+        intensity_upstream: str = None,
+    ) -> None:
+        super().__init__(data_files, anode, energies, raw, time_per_step,
+                         target_density, intensity_downstream,
+                         intensity_upstream)
+
+    @property
+    def energies(self) -> np.ndarray:
+        return self.steps
+
+    @energies.setter
+    def energies(self, value: np.ndarray) -> None:
+        self.steps = value
 
