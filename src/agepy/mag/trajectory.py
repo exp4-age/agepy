@@ -5,6 +5,7 @@
 import numpy as np
 import pandas as pd
 from pandas.core.generic import NDFrame
+import warnings
 
 
 def euclid_dist(p: np.ndarray, q: np.ndarray) -> np.float64:
@@ -61,7 +62,7 @@ def add_diff(df: pd.DataFrame, periods: int = 1, dim_col: str = "x") -> pd.DataF
     elif dim_col == "z":
         df["diff_z"] = df.groupby("particle")["z"].diff(periods=periods)
     else:
-        print(
+        warnings.warn(
             f"The column {dim_col} is not x/y/z. Trying to differentiate anyways. Check your results!"
         )
         df[f"diff_{dim_col}"] = df.groupby("particle")[f"{dim_col}"].diff(
@@ -101,7 +102,7 @@ def get_vmax(df: pd.DataFrame, periods: int = 1, dim_col: str = "x"):
 
 def get_vavg(
     df: pd.DataFrame, periods: int = 1, dim_col: str = "x", cutoff: float = 0.5
-) -> pd.Series | float:
+) -> pd.Series:
     """Calculates the mean velocity of the particles.
 
     Takes the dataframe of particles, calculates diff for given dimension, then mean of absolute value for each particle in this df. Finally returns the mean of all these particles.
