@@ -71,7 +71,7 @@ def add_diff(df: pd.DataFrame, periods: int = 1, dim_col: str = "x") -> pd.DataF
     return df
 
 
-def get_vmax(df: pd.DataFrame, periods: int = 1, dim_col: str = "x"):
+def get_vmax(df: pd.DataFrame, periods: int = 1, dim_col: str = "x") -> float:
     """Calculates the absolute mean maximum velocity of the particles.
 
     Takes the dataframe of particles, calculates diff for given dimension,
