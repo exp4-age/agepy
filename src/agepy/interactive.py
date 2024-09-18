@@ -42,3 +42,15 @@ class AGEpp:
     def run(self):
         self.viewer.show()
         return self.app.exec_()
+
+
+class AGEpp:
+    def __init__(self, viewer: QMainWindow, *args, **kwargs):
+        self.app = QApplication.instance()
+        if self.app is None:
+            self.app = QApplication([])
+        self.viewer = viewer(*args, **kwargs)
+
+    def run(self):
+        self.viewer.show()
+        return self.app.exec_()
