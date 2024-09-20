@@ -192,8 +192,8 @@ class Spectrum:
         phem_calib: Tuple[float, float] = None,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
-        TODO
-        ----
+        Notes
+        -----
         - Implement handling of the uncertainties of the efficiency map
         - Background subtraction is very primitive and uncertainties are
           not propagated correctly
@@ -300,8 +300,8 @@ class Scan:
     steps: np.ndarray
         Array of the scan variable values.
 
-    TODO
-    ----
+    Notes
+    -----
     - Very minimal implementation, needs to be expanded
 
     """
@@ -422,8 +422,8 @@ class EnergyScan(Scan):
     energies: np.ndarray
         Array of the scan variable values.
 
-    TODO
-    ----
+    Notes
+    -----
     - Very minimal implementation, needs to be expanded
 
     """

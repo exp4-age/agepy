@@ -43,12 +43,13 @@ extensions = [
     "nbsphinx",  # https://jupyter-tutorial.readthedocs.io/de/latest/sphinx/nbsphinx.html
 ]
 
-autosummary_imported_members = True
+autosummary_imported_members = False
 autosummary_generate = True
 autoclass_content = "class"
 html_show_sourcelink = False
 set_type_checking_flag = True
-nbsphinx_allow_errors = True
+nbsphinx_allow_errors = False
+nbsphinx_execute = "always"
 add_module_names = False
 
 templates_path = ["_templates"]
@@ -68,6 +69,12 @@ plot_html_show_formats = False
 autosummary_generate = ["reference"]
 
 copybutton_prompt_text = ">>> "
+
+def autodoc_skip_member(app, what, name, obj, skip, options):
+    return None
+
+def setup(app):
+    app.connect('autodoc-skip-member', autodoc_skip_member)
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
