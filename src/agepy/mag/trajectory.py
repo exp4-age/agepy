@@ -1,7 +1,7 @@
 """Functions for working with trajectories.
 
 """
-
+from __future__ import annotations
 import numpy as np
 import pandas as pd
 from pandas.core.generic import NDFrame
