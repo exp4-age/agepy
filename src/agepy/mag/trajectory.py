@@ -9,12 +9,16 @@ import warnings
 
 
 def euclid_dist(p: np.ndarray, q: np.ndarray) -> np.float64:
-    """Get euclidean distance between two points."""
+    """Get euclidean distance between two points.
+
+    """
     return np.linalg.norm(p - q)
 
 
 def filter_short(df: pd.DataFrame, min_len: float, printing: bool = False) -> NDFrame:
-    """Filter trajectories by euclidean distance of x_end - x_start."""
+    """Filter trajectories by euclidean distance of x_end - x_start.
+
+    """
     if printing:
         print(f"before: {df.particle.nunique()}")
     filtered = df.groupby("particle").filter(
@@ -30,6 +34,7 @@ def drop_x_y(df: pd.DataFrame, xmin: int, ymin: int) -> pd.DataFrame:
 
     This gets rid of particles too close to the border.
     Do this before linking.
+
     """
     return df.drop(df[(df.x < xmin) | (df.y < ymin)].index).reset_index(drop=True)
 
@@ -157,6 +162,7 @@ def get_mobile(
     -------
     mobile: ndarray
         Sorted array with names/numbers of mobile particles.
+
     """
     df_copy = df.copy()
     if dim_col == "x":
@@ -194,6 +200,7 @@ def get_mobility(
     -------
     mobility: float
         percentage of mobile particles.
+
     """
     mobile = get_mobile(df, thresh, periods=periods, dim_col=dim_col)
     return len(mobile) / df.particle.nunique()

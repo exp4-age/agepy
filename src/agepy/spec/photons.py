@@ -130,6 +130,10 @@ class Spectrum:
         ----------
         anode: PositionAnode
             Anode object from `agepy.spec.photons`.
+        roi: dict
+            Region of interest for the detector. If not provided, the
+            full detector is used: `{"x": {"min": 0, "max": 1},
+            "y": {"min": 0, "max": 1}}`.
         """
         # Get the xy values
         if anode is None:
