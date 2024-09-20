@@ -4,7 +4,7 @@
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-from pandas.core.generic import NDFrame
+from pandas.api.typing import DataFrameGroupBy
 import warnings
 
 
@@ -15,7 +15,7 @@ def euclid_dist(p: np.ndarray, q: np.ndarray) -> np.float64:
     return np.linalg.norm(p - q)
 
 
-def filter_short(df: pd.DataFrame, min_len: float, printing: bool = False) -> NDFrame:
+def filter_short(df: pd.DataFrame, min_len: float, printing: bool = False) -> DataFrameGroupBy:
     """Filter trajectories by euclidean distance of x_end - x_start.
 
     """
