@@ -15,6 +15,7 @@ colors: list
 """
 
 import matplotlib.pyplot as plt
+from contextlib import contextmanager
 
 age_styles = ["age", "tex", "nature", "prl", "pccp", "powerpoint",
               "latexbeamer"]
@@ -81,6 +82,60 @@ def use(styles):
 
     plt.style.use("default")  # reset rcParams before applying the style
     plt.style.use(load_styles)  # apply the selected styles
+
+
+@contextmanager
+def context(styles):
+    """Context manager for using the AGE style in a with statement.
+
+    Notes
+    -----
+    All style rcParams are reset to the matplotlib default before
+    loading the specified styles.
+
+    Warnings
+    --------
+    Compatibility between styles is not guaranteed.
+
+    Parameters
+    ----------
+    styles: str or list of string
+        Styles to be loaded using :py:func:`plt.style.context`.
+        Available styles can be viewed by calling
+        :py:data:`ageplot.age_styles` and :py:data:`ageplot.mpl_styles`.
+
+    Examples
+    --------
+    How to use the AGE style in a with statement:
+
+    >>> import matplotlib.pyplot as plt
+    >>> from agepy import ageplot
+    >>> with ageplot.context(["age", "prl"]):
+    ...     plt.plot([1, 2, 3], [4, 5, 6])
+
+    """
+    load_styles = ["default"]
+    # Check if styles are available
+    if isinstance(styles, list):
+        for style in styles:
+            if style in age_styles:
+                load_styles.append("agepy.ageplot." + style)
+            elif style in mpl_styles:
+                load_styles.append(style)
+            else:
+                raise ValueError(style + " is not an available style.")
+    elif isinstance(styles, str):
+        if styles in age_styles:
+            load_styles.append("agepy.ageplot." + styles)
+        elif styles in mpl_styles:
+            load_styles.append(styles)
+        else:
+            raise ValueError(styles + " is not an available style.")
+    else:
+        raise TypeError("Expected str or list of strings specifying styles.")
+    # Use the matplotlib style context manager
+    with plt.style.context(load_styles):
+        yield
 
 
 class figsize():
