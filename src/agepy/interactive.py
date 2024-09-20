@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from typing import Tuple
 
+from agepy import ageplot
 
 
 class AGEDataViewer(QMainWindow):
@@ -19,9 +20,10 @@ class AGEDataViewer(QMainWindow):
         self.setCentralWidget(self.main_widget)
         self.layout = QVBoxLayout(self.main_widget)
         # Matplotlib
-        # Set the agepy plotting style
-        with plt.style.context(["agepy.ageplot.age",
-                                "agepy.ageplot.dataviewer"]):
+        # Draw with the agepy plotting style, but don't overwrite the
+        # users rcParams
+        with ageplot.context(["agepy.ageplot.age",
+                              "agepy.ageplot.dataviewer"]):
             # Create and add the canvas
             self.canvas = FigureCanvas(Figure())
             self.layout.addWidget(self.canvas)
@@ -32,16 +34,6 @@ class AGEDataViewer(QMainWindow):
         # Add the toolbar
         self.toolbar = NavigationToolbar(self.canvas, self)
         self.layout.addWidget(self.toolbar)
-
-
-class AGEpp:
-    def __init__(self, viewer: QMainWindow, *args, **kwargs):
-        self.app = QApplication([])
-        self.viewer = viewer(*args, **kwargs)
-
-    def run(self):
-        self.viewer.show()
-        return self.app.exec_()
 
 
 class AGEpp:
