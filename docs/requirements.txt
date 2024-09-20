@@ -38,3 +38,6 @@ notebook
 
 # h5py https://pypi.org/project/h5py/
 h5py
+
+# PyQt5 https://pypi.org/project/PyQt5/
+PyQt5
