@@ -1,16 +1,16 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
-from PyQt5.QtCore import Qt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
-from typing import Tuple
 
 from agepy import ageplot
 
 
 class AGEDataViewer(QMainWindow):
+    """Minimal implementation of the AGE Data Viewer.
+    Should be used as a base class for more complex viewers.
+
+    """
     def __init__(self):
         super().__init__()
         # Set up the PyQt window

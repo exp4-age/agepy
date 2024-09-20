@@ -9,7 +9,7 @@ import numpy as np
 import h5py
 
 from ._anodes import *
-from agepy.spec.interactive.photons import AGEScanViewer
+from agepy.interactive.photons import AGEScanViewer
 from agepy.interactive import AGEpp
 
 
@@ -409,4 +409,3 @@ class EnergyScan(Scan):
     @energies.setter
     def energies(self, value: np.ndarray) -> None:
         self.steps = value
-

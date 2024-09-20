@@ -1,17 +1,9 @@
 from __future__ import annotations
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QStyle
-from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import Qt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
-from matplotlib.widgets import RectangleSelector, Button
-from matplotlib.figure import Figure
+from PyQt5.QtWidgets import QPushButton, QStyle
 import matplotlib.pyplot as plt
-from typing import Tuple
 import numpy as np
 
 from agepy.interactive import AGEDataViewer
-
 
 
 class AGEScanViewer(AGEDataViewer):
