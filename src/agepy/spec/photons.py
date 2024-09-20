@@ -388,8 +388,44 @@ class Scan:
 
 
 class EnergyScan(Scan):
-    """
-    
+    """Scan over exciting-photon energies with a spectrum for each step.
+
+    Parameters
+    ----------
+    data_files: Sequence[str]
+        List of data files to be processed.
+    anode: PositionAnode
+        Anode object from `agepy.spec.photons`.
+    energies: str, optional
+        Path to the energy values in the data files. If None,
+        the keys are used as the values.
+    raw: str, optional
+        Path to the raw data in the data files. Default:
+        "dld_rd#raw/0".
+    time_per_step: int, optional
+        Time per step in the scan. Default: None.
+    target_density: str, optional
+        Path to the target density in the data files. Default: None.
+    intensity_downstream: str, optional
+        Path to the downstream intensity in the data files. Default:
+        None.
+    intensity_upstream: str, optional
+        Path to the upstream intensity in the data files. Default:
+        None.
+
+    Attributes
+    ----------
+    anode: PositionAnode
+        Anode object from `agepy.spec.photons`.
+    spectra: np.ndarray
+        Array of the loaded Spectrum objects.
+    energies: np.ndarray
+        Array of the scan variable values.
+
+    TODO
+    ----
+    - Very minimal implementation, needs to be expanded
+
     """
 
     def __init__(self,
