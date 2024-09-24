@@ -5,12 +5,15 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import numpy as np
 
+from agepy.interactive import AGEpp
+from agepy.interactive.coincedence import AGECoincViewer
 
 
 def plot_coinc_map(coincmap, xedges, yedges, figsize=None, cmap='YlOrRd',
                    title=None, norm=None, vmin=1, vmax=None, num=None,
                    xlabel="early electron kinetic energy",
-                   ylabel="late electron kinetic energy"):
+                   ylabel="late electron kinetic energy",
+                   interactive=False):
     """Plot a coincedence map and its projections on the x and y axes.
 
     Parameters
@@ -96,4 +99,8 @@ def plot_coinc_map(coincmap, xedges, yedges, figsize=None, cmap='YlOrRd',
     if title is not None:
         fig.suptitle(title)
 
-    return fig, (ax_coinc, ax_x, ax_y)
+    if interactive:
+        app = AGEpp(AGECoincViewer, fig, (ax_coinc, ax_x, ax_y, ax_cb_inset))
+        app.run()
+    else:
+        return fig, (ax_coinc, ax_x, ax_y, ax_cb_inset)

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from agepy.interactive import AGEDataViewer
+from agepy import ageplot
 
 
 class AGEScanViewer(AGEDataViewer):
@@ -38,8 +39,7 @@ class AGEScanViewer(AGEDataViewer):
         self.plot(self.step)
     
     def plot(self, step: int) -> None:
-        with plt.style.context(["agepy.ageplot.age",
-                                "agepy.ageplot.dataviewer"]):
+        with ageplot.context(["age", "dataviewer"]):
             self.ax.clear()
             self.ax.stairs(self.y[step], self.x)
             self.canvas.draw()
