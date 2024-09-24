@@ -1,1 +1,2 @@
 include src/agepy/ageplot/*.mplstyle
+include src/agepy/interactive/icons/roi.svg
