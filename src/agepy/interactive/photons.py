@@ -14,6 +14,12 @@ class AGEScanViewer(AGEDataViewer):
 
     def __init__(self, scan, bins: int = 512) -> None:
         super().__init__()
+        # Add plot to canvas
+        self.add_plot()
+        # Add the toolbar
+        self.add_toolbar()
+        # Add forward and backward buttons
+        self.add_forward_backward_action(self.plot_previous, self.plot_next)
         # Get the data
         self.y = []
         self.err = []
@@ -24,17 +30,6 @@ class AGEScanViewer(AGEDataViewer):
             self.err.append(err)
         # Remember current step
         self.step = 0
-        # Add previous and next buttons
-        self.prev = QPushButton()
-        self.prev.clicked.connect(self.plot_previous)
-        icon_prev = self.style().standardIcon(QStyle.SP_ArrowBack)
-        self.prev.setIcon(icon_prev)
-        self.toolbar.addWidget(self.prev)
-        self.next = QPushButton()
-        self.next.clicked.connect(self.plot_next)
-        icon_next = self.style().standardIcon(QStyle.SP_ArrowForward)
-        self.next.setIcon(icon_next)
-        self.toolbar.addWidget(self.next)
         # Plot the first step
         self.plot(self.step)
     
