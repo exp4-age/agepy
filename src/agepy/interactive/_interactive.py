@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QAc
 from PyQt5.QtGui import QIcon
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
@@ -63,6 +64,28 @@ class AGEDataViewer(QMainWindow):
         actions = self.toolbar.actions()
         self.roi_button = self.toolbar.insertAction(actions[-1], roi)
 
+    def add_rect_selector(self,
+        ax: Axes,
+        on_select: callable,
+        interactive: bool = True
+    ) -> None:
+        # Add the action
+        self.add_roi_action(self.toggle_selector)
+        # Add ROI selector
+        self.selector = RectangleSelector(
+            ax, on_select,
+            useblit=True,
+            button=[1],
+            minspanx=5, minspany=5,
+            spancoords="pixels",
+            interactive=interactive,
+            props={"linewidth": 0.83, "linestyle": "--", "fill": False},
+            handle_props={"markersize": 0})
+        self.selector.set_active(False)
+
+    def toggle_selector(self):
+        self.selector.set_active(not self.selector.active)
+
     def add_forward_backward_action(self,
         bw_callback: callable,
         fw_callback: callable
@@ -78,6 +101,14 @@ class AGEDataViewer(QMainWindow):
             fw = QAction(QIcon(str(ipath)), "Step Forward", self)
         fw.triggered.connect(fw_callback)
         self.fw = self.toolbar.insertAction(actions[-1], fw)
+
+    def add_lookup_action(self, callback: callable) -> None:
+        actions = self.toolbar.actions()
+        with imrsrc.path("agepy.interactive.icons", "search.svg") as ipath:
+            lu = QAction(QIcon(str(ipath)), "Look Up", self)
+        lu.triggered.connect(callback)
+        self.lu = self.toolbar.insertAction(actions[-1], lu)
+
 
 class AGEpp:
     def __init__(self, viewer: QMainWindow, *args, **kwargs):
