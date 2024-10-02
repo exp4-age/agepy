@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Union, Sequence
 import importlib.resources as imrsrc
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLayout, QVBoxLayout, QWidget, QAction
 from PyQt5.QtGui import QIcon
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
@@ -31,7 +31,8 @@ class AGEDataViewer(QMainWindow):
 
     def add_plot(self,
         fig: Figure = None,
-        ax: Union[Axes, Sequence[Axes]] = None
+        ax: Union[Axes, Sequence[Axes]] = None,
+        layout: QLayout = None
     ) -> None:
         # Draw with the agepy plotting style, but don't overwrite the
         # users rcParams
@@ -41,7 +42,10 @@ class AGEDataViewer(QMainWindow):
                 self.canvas = FigureCanvas(fig)
             else:
                 self.canvas = FigureCanvas(Figure())
-            self.layout.addWidget(self.canvas)
+            if layout is None:
+                self.layout.addWidget(self.canvas)
+            else:
+                layout.addWidget(self.canvas)
             # Create the axis
             if ax is not None:
                 self.ax = ax
