@@ -32,7 +32,9 @@ class AGEDataViewer(QMainWindow):
     def add_plot(self,
         fig: Figure = None,
         ax: Union[Axes, Sequence[Axes]] = None,
-        layout: QLayout = None
+        layout: QLayout = None,
+        width: int = 1200,
+        height: int = 800
     ) -> None:
         # Draw with the agepy plotting style, but don't overwrite the
         # users rcParams
@@ -42,6 +44,8 @@ class AGEDataViewer(QMainWindow):
                 self.canvas = FigureCanvas(fig)
             else:
                 self.canvas = FigureCanvas(Figure())
+            # Set fixed size for the canvas
+            self.canvas.setFixedSize(width, height)
             if layout is None:
                 self.layout.addWidget(self.canvas)
             else:
