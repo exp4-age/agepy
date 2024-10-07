@@ -17,8 +17,8 @@ class AGEDataViewer(QMainWindow):
     Should be used as a base class for more complex viewers.
 
     """
-    def __init__(self, width: int = 1200, height: int = 800):
-        super().__init__()
+    def __init__(self, width: int = 1200, height: int = 800, parent=None):
+        super().__init__(parent)
         # Set up the PyQt window
         self.setWindowTitle("AGE Data Viewer")
         self.setGeometry(100, 100, width, height)
