@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>1200</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="layoutMain" rowstretch="0,0">
+    <item row="0" column="3" colspan="2">
+     <widget class="QGroupBox" name="groupParams">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>276</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Parameters</string>
+      </property>
+      <layout class="QVBoxLayout" name="layoutParams"/>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QGroupBox" name="groupBackend">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>276</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Backend</string>
+      </property>
+      <layout class="QVBoxLayout" name="layoutBackend">
+       <item>
+        <widget class="QComboBox" name="selectBackend"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QGroupBox" name="groupMinimize">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>276</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Fit</string>
+      </property>
+      <layout class="QVBoxLayout" name="layoutMinimize">
+       <item>
+        <widget class="QPushButton" name="buttonFit">
+         <property name="text">
+          <string>Minimize</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="2" colspan="2">
+     <widget class="QGroupBox" name="groupModel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>276</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Model (Signal + Background)</string>
+      </property>
+      <layout class="QHBoxLayout" name="l">
+       <item>
+        <widget class="QComboBox" name="selectSignal"/>
+       </item>
+       <item>
+        <widget class="QComboBox" name="selectBackground"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QGroupBox" name="groupCost">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>276</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>Cost Function</string>
+      </property>
+      <layout class="QVBoxLayout" name="layoutCost">
+       <item>
+        <widget class="QComboBox" name="selectCost"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="3">
+     <widget class="QGroupBox" name="groupFitView">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>276</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>FitView</string>
+      </property>
+      <layout class="QVBoxLayout" name="layoutFitView"/>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1600</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
