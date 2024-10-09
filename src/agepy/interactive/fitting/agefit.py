@@ -15,6 +15,7 @@ from jacobi import propagate
 
 from agepy import ageplot
 from agepy.interactive import AGEDataViewer, AGEpp
+from agepy.interactive.fitting import list_signal_models, list_background_models, get_model
 
 
 class FloatSlider(QSlider):
@@ -132,7 +133,7 @@ class AGEFitViewer(QMainWindow):
             _agefit = AGEFit(xdata, ydata, yerr, data)
             _agefit.plot_data(self.ax)
             self.ax.set_title("AGE Fit")
-            self.ax.set_xlim(*self.ax.get_xlim())
+            self.ax.set_xlim(_agefit.xe[0], _agefit.xe[-1])
             self.ax.set_ylim(*self.ax.get_ylim())
             self.canvas.draw()
         # Remember the last Line2D objects in order to remove them when
@@ -156,6 +157,16 @@ class AGEFitViewer(QMainWindow):
         self.init_backend()
         # Connect the backend selection to the initialization
         self.selectBackend.currentIndexChanged.connect(self.init_backend)
+        # Initialize the model selection
+        sig_models = list_signal_models()
+        self.selectSignal.addItems(sig_models)
+        if self.sig in sig_models:
+            self.selectSignal.setCurrentText(self.sig)
+        bkg_models = list_background_models()
+        self.selectBackground.addItems(bkg_models)
+        if self.bkg in bkg_models:
+            self.selectBackground.setCurrentText(self.bkg)
+        self.change_model()
         # Connect signals
         self.selectCost.currentIndexChanged.connect(self.change_cost)
         self.selectSignal.currentIndexChanged.connect(self.change_model)
@@ -177,35 +188,20 @@ class AGEFitViewer(QMainWindow):
         self.selectCost.addItems(available_costs)
         if self.cost in available_costs:
             self.selectCost.setCurrentText(self.cost)
-        #else:
-        #    self.cost = self.selectCost.currentText()
         self.change_cost()
-        # Update the model selection
-        available_sig = self.backend.signals
-        self.selectSignal.clear()
-        self.selectSignal.addItems(available_sig)
-        if self.sig in available_sig:
-            self.selectSignal.setCurrentText(self.sig)
-        #else:
-        #    self.sig = self.selectSignal.currentText()
-        available_bkg = self.backend.backgrounds
-        self.selectBackground.clear()
-        self.selectBackground.addItems(available_bkg)
-        if self.bkg in available_bkg:
-            self.selectBackground.setCurrentText(self.bkg)
-        #else:
-        #    self.bkg = self.selectBackground.currentText()
-        self.change_model()
 
     def change_cost(self):
         self.cost = self.selectCost.currentText()
+        self.backend.cost = self.cost
 
     def change_model(self):
         # Get the selected signal and background
         self.sig = self.selectSignal.currentText()
         self.bkg = self.selectBackground.currentText()
         # Initialize the model
-        self.backend.init_model(self.sig, self.bkg)
+        sig = get_model(self.sig)(self.backend.xe[0], self.backend.xe[-1])
+        bkg = get_model(self.bkg)(self.backend.xe[0], self.backend.xe[-1])
+        self.backend.init_model(sig, bkg)
         self.model = self.backend.model
         params = self.backend.params
         # Clear the current parameters
@@ -213,6 +209,10 @@ class AGEFitViewer(QMainWindow):
         # Get x limits
         xlim = self.ax.get_xlim()
         xlim = (round(xlim[0], 1), round(xlim[1], 1))
+        # Get current parameters and reset
+        curr_params = self.params
+        self.params = {}
+        # Add parameters
         for par in params:
             # Add group box
             group = QGroupBox(par)
@@ -227,20 +227,23 @@ class AGEFitViewer(QMainWindow):
             editLLimit = QLineEdit()
             editULimit = QLineEdit()
             # Set the values
+            ######## Use the limits from the model ########
             if par == "loc":
                 val = 0.5 * (xlim[0] + xlim[1])
                 llimit, ulimit = xlim
             elif par == "scale":
-                val = 0.5 * (xlim[1] - xlim[0])
+                val = 0.1 * (xlim[1] - xlim[0])
                 llimit = 0.0001 * val
-                ulimit = 2 * val
+                ulimit = 5 * val
+            elif par in ["s", "b"]:
+                val, llimit, ulimit = (10, 0, 1000)
             else:
                 val, llimit, ulimit = (0, -1000, 1000)
-            if par not in self.params:
-                self.params[par] = {"val": val, "limits": (llimit, ulimit)}
-            elif "val" in self.params[par] and "limits" in self.params[par]:
-                val = self.params[par]["val"]
-                llimit, ulimit = self.params[par]["limits"]
+            if (par in curr_params and "val" in curr_params[par]
+                    and "limits" in curr_params[par]):
+                val = curr_params[par]["val"]
+                llimit, ulimit = curr_params[par]["limits"]
+            self.params[par] = {"val": val, "limits": (llimit, ulimit)}
             slider.setMinimum(llimit)
             slider.setMaximum(ulimit)
             slider.setValue(val)
@@ -261,6 +264,7 @@ class AGEFitViewer(QMainWindow):
             # Save the parameter
             self.params[par]["qt"] = [slider, editValue, editLLimit, editULimit]
         self.layoutParams.addStretch()
+        self.update_prediction()
 
     def clear_params(self, layout: QLayout):
         self.params = {}
@@ -308,7 +312,13 @@ class AGEFitViewer(QMainWindow):
                 slider.setValue(current_value)
             slider.blockSignals(False)
 
-    def update_params(self, slider_value=None, params=None, cov=None):
+    def update_params(self, slider_value=None):
+        for par in self.params:
+            editValue = self.params[par]["qt"][1]
+            self.params[par]["val"] = float(editValue.text())
+        self.update_prediction()
+
+    def update_prediction(self, params=None, cov=None):
         if self.pred_line is not None:
             self.pred_line.remove()
             self.pred_line = None
@@ -346,10 +356,13 @@ class AGEFitViewer(QMainWindow):
     def fit(self):
         start = self.get_params()
         limits = self.get_limits()
-        params, cov, res = self.agefit.fit(start, limits)
-        self.update_params(params=params, cov=cov)
+        # Perform the fit
+        params, cov, res = self.backend.fit(start, limits)
+        # Show the fit result
         res_window = FitResultWindow(res, self)
         res_window.show()
+        # Update the prediction
+        self.update_prediction(params=params, cov=cov)
 
 
 class AGEFit:
@@ -386,6 +399,36 @@ class AGEFit:
             n, = np.histogram(self.data, bins=self.xe)
             ax.errorbar(self.x, n, yerr=np.sqrt(n), fmt="s",
                         color=ageplot.colors[0])
+
+
+class SpecFit:
+    """
+
+    """
+
+    def __init__(self,
+        xedges: np.ndarray,
+        binned_data: np.ndarray,
+        unbinned_data: np.ndarray,
+    ) -> None:
+        self.xe = xedges
+        self.x = 0.5 * (xedges[1:] + xedges[:-1])
+        self.binned_data = binned_data
+        self.unbinned_data = unbinned_data
+
+    @classmethod
+    def unbinned(cls, data: np.ndarray, xedges: np.ndarray) -> SpecFit:
+        n = np.histogram(data, bins=xedges)[0]
+        return cls(xedges, np.stack([n, n], axis=-1), data)
+
+    @classmethod
+    def binned(cls,
+        data: np.ndarray,
+        err: np.ndarray,
+        xedges: np.ndarray
+    ) -> SpecFit:
+        n = np.stack([data, err**2], axis=-1)
+        return cls(xedges, n, None)
 
 
 def agefit(

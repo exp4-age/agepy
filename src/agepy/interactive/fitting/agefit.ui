@@ -7,143 +7,105 @@
     <x>0</x>
     <y>0</y>
     <width>1600</width>
-    <height>1200</height>
+    <height>750</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>14</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="layoutMain" rowstretch="0,0">
-    <item row="0" column="3" colspan="2">
-     <widget class="QGroupBox" name="groupParams">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>276</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Parameters</string>
-      </property>
-      <layout class="QVBoxLayout" name="layoutParams"/>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QGroupBox" name="groupBackend">
+   <layout class="QGridLayout" name="layoutMain" rowstretch="1,0">
+    <item row="1" column="0" colspan="4">
+     <widget class="QGroupBox" name="groupFitSetup">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>276</height>
-       </size>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
       </property>
       <property name="title">
-       <string>Backend</string>
+       <string/>
       </property>
-      <layout class="QVBoxLayout" name="layoutBackend">
-       <item>
-        <widget class="QComboBox" name="selectBackend"/>
-       </item>
-      </layout>
+      <layout class="QHBoxLayout" name="layoutFitSetup"/>
      </widget>
     </item>
-    <item row="1" column="4">
-     <widget class="QGroupBox" name="groupMinimize">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>276</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Fit</string>
-      </property>
-      <layout class="QVBoxLayout" name="layoutMinimize">
-       <item>
-        <widget class="QPushButton" name="buttonFit">
-         <property name="text">
-          <string>Minimize</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="1" column="2" colspan="2">
-     <widget class="QGroupBox" name="groupModel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>276</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Model (Signal + Background)</string>
-      </property>
-      <layout class="QHBoxLayout" name="l">
-       <item>
-        <widget class="QComboBox" name="selectSignal"/>
-       </item>
-       <item>
-        <widget class="QComboBox" name="selectBackground"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QGroupBox" name="groupCost">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>276</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>Cost Function</string>
-      </property>
-      <layout class="QVBoxLayout" name="layoutCost">
-       <item>
-        <widget class="QComboBox" name="selectCost"/>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="0" colspan="3">
+    <item row="0" column="0" colspan="2">
      <widget class="QGroupBox" name="groupFitView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>276</height>
+        <height>16777215</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
       </property>
       <property name="title">
        <string>FitView</string>
       </property>
       <layout class="QVBoxLayout" name="layoutFitView"/>
+     </widget>
+    </item>
+    <item row="0" column="2" colspan="2">
+     <widget class="QGroupBox" name="groupParams">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>14</pointsize>
+       </font>
+      </property>
+      <property name="title">
+       <string>Parameters</string>
+      </property>
+      <layout class="QVBoxLayout" name="layoutParameters">
+       <item>
+        <widget class="QScrollArea" name="scrollArea">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>762</width>
+            <height>589</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="layoutParams"/>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>
@@ -154,7 +116,7 @@
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
