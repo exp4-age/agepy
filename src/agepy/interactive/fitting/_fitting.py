@@ -58,37 +58,6 @@ class FloatSlider(QSlider):
         super().setSliderPosition(self._float_to_int(value))
 
 
-class FitResultWindow(AGEDataViewer):
-    """
-
-    """
-
-    def __init__(self, fit_result, parent):
-        super().__init__(parent=parent)
-        self.setWindowTitle("Fit Result")
-        # Set a bigger font size
-        font = QFont("Courier")
-        font.setPointSize(14)
-        self.setFont(font)
-        # Create a QTextEdit widget
-        self.text_edit = QTextEdit(self)
-        self.text_edit.setReadOnly(True)
-        # Set the fit result text
-        self.text_edit.setPlainText(fit_result)
-        # Calculate the size of the text
-        font_metrics = QFontMetrics(font)
-        text_size = font_metrics.size(0, fit_result)
-        text_width = text_size.width() + 50
-        text_height = text_size.height() + 50
-        # Set the window size based on the text size
-        self.resize(text_width, text_height)
-        # Add to the layout
-        self.layout.addWidget(self.text_edit)
-        # Move the window
-        parent_rect = parent.geometry()
-        self.move(parent_rect.topLeft() + QPoint(100, 100))
-
-
 class AGEFitViewer(QMainWindow):
     """
     
@@ -129,9 +98,11 @@ class AGEFitViewer(QMainWindow):
         self.layoutFitSetup.addWidget(group)
         layoutGroup = QHBoxLayout()
         group.setLayout(layoutGroup)
-        buttonFit = QPushButton("Fit", self)
+        buttonFit = QPushButton("Minimize", self)
         layoutGroup.addWidget(buttonFit)
         buttonFit.clicked.connect(self.fit)
+        # Add the result text box
+        self.textResults.setPlainText(self.backend.print_result())
         # Draw the initial model
         self.update_prediction()
 
@@ -224,7 +195,6 @@ class AGEFitViewer(QMainWindow):
             editULimit.returnPressed.connect(self.update_limits)
             # Save the parameter
             self.params[par] = [slider, editValue, editLLimit, editULimit]
-        #self.layoutParams.addStretch()
         self.update_prediction()
 
     def clear_params(self, layout: QLayout):
@@ -248,7 +218,7 @@ class AGEFitViewer(QMainWindow):
             # Update the limits
             self.backend.change_limit(par, (llimit, ulimit))
             # Adjust the slider limits
-            current_value = slider.value()
+            current_value = self.backend.value(par)
             slider.setMinimum(llimit)
             slider.setMaximum(ulimit)
             # Ensure the slider's value is within the new range
@@ -257,9 +227,11 @@ class AGEFitViewer(QMainWindow):
             if current_value < llimit:
                 slider.setValue(llimit)
                 editValue.setText(str(llimit))
+                self.update_backend_params()
             elif current_value > ulimit:
                 slider.setValue(ulimit)
                 editValue.setText(str(ulimit))
+                self.update_backend_params()
             else:
                 slider.setValue(current_value)
             slider.blockSignals(False)
@@ -292,8 +264,8 @@ class AGEFitViewer(QMainWindow):
         # Perform the fit
         self.backend.fit()
         # Show the fit result
-        res_window = FitResultWindow(self.backend.print_result(), self)
-        res_window.show()
+        self.textResults.clear()
+        self.textResults.setPlainText(self.backend.print_result())
         # Update the displayed parameters
         self.update_gui_params()
         # Update the prediction
