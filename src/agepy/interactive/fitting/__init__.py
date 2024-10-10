@@ -1,1 +1,1 @@
-from ._fitting import AGEFitViewer
+from ._fitting import AGEFitViewer, AGEFit

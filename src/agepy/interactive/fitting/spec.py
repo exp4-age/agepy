@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import List, TypedDict, Sequence, Tuple
 from functools import partial
-from PyQt5.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QMainWindow
 import inspect
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
@@ -13,7 +13,7 @@ from jacobi import propagate
 
 from agepy import ageplot
 from agepy.interactive import AGEpp
-from agepy.interactive.fitting import AGEFitViewer
+from agepy.interactive.fitting import AGEFitViewer, AGEFit
 
 
 class ModelDict(TypedDict):
@@ -21,7 +21,7 @@ class ModelDict(TypedDict):
     background: List[str]
 
 
-class SpecFit:
+class SpecFit(AGEFit):
     """
 
     """
@@ -71,9 +71,6 @@ class SpecFit:
             costs.append("ExtendedUnbinnedNLL")
         return costs
 
-    def which_cost(self) -> str:
-        return self._cost_name
-
     def select_cost(self, name: str) -> None:
         if name not in self.list_costs():
             raise ValueError(f"Cost function {name} not available.")
@@ -100,9 +97,6 @@ class SpecFit:
             "background": list(self._models["background"].keys())
         }
         return models
-
-    def which_model(self) -> dict:
-        return self._model_name
 
     def select_model(self, signal, background) -> None:
         if signal not in self._models["signal"]:
@@ -194,28 +188,6 @@ class SpecFit:
         limits = {f"a{i}": (-1000, 1000) for i in range(deg+1)}
         return model, integral, params, limits
 
-    def list_params(self) -> dict:
-        return self._params
-
-    def list_limits(self) -> dict:
-        return self._limits
-
-    def value(self, name: str) -> float:
-        if name not in self.list_params():
-            raise ValueError(f"Parameter {name} not available.")
-        return self._params[name]
-
-    def change_value(self, name: str, value: float) -> None:
-        if name not in self.list_params():
-            raise ValueError(f"Parameter {name} not available.")
-        self._params[name] = value
-        self._cov = None
-
-    def change_limit(self, name: str, limits: Tuple[float, float]) -> None:
-        if name not in self.list_params():
-            raise ValueError(f"Parameter {name} not available.")
-        self._limits[name] = limits
-
     def fit(self) -> None:
         self._minuit = Minuit(self._cost, **self._params)
         for name, limits in self._limits.items():
@@ -234,6 +206,8 @@ class SpecFit:
         ax.errorbar(self.x, self.binned_data[:, 0],
                     yerr=np.sqrt(self.binned_data[:, 1]), fmt="s",
                     color=ageplot.colors[0])
+        ax.set_xlim(*self.xr)
+        ax.set_title("Spectrum Fit (iminuit)")
 
     def plot_prediction(self, ax: Axes) -> Sequence[Line2D]:
         dx = 1
@@ -280,7 +254,8 @@ def fit_spectrum(
     
     """
     binned_data = np.stack([ydata, yerr**2], axis=-1)
-    _specfit = SpecFit(xdata, binned_data, data, cost, sig, bkg)
+    #_specfit = SpecFit(xdata, binned_data, data, cost, sig, bkg)
+    _specfit = AGEFit()
     if parent is None:
         app = AGEpp(AGEFitViewer, _specfit)
         app.run()
