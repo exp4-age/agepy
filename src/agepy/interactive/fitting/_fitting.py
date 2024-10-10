@@ -1,21 +1,12 @@
 from __future__ import annotations
 from importlib.resources import path
-import inspect
-from functools import wraps, partial
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.axes import Axes
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QLayout, QHBoxLayout, QGridLayout, QVBoxLayout, QGroupBox, QComboBox, QTextEdit, QSlider, QLineEdit, QPushButton
-from PyQt5.QtGui import QFont, QFontMetrics
-from PyQt5.QtCore import Qt, pyqtSignal, QPoint
-import numpy as np
-from jacobi import propagate
+from PyQt5.QtWidgets import QMainWindow, QLayout, QHBoxLayout, QGridLayout, QGroupBox, QComboBox, QSlider, QLineEdit, QPushButton
+from PyQt5.QtCore import Qt, pyqtSignal
 
 from agepy import ageplot
-from agepy.interactive import AGEDataViewer, AGEpp
-from agepy.interactive.fitting import list_signal_models, list_background_models, get_model
 
 
 class FloatSlider(QSlider):
