@@ -1,24 +1,22 @@
 from __future__ import annotations
-from typing import List, TypedDict, Sequence, Tuple
+from typing import TYPE_CHECKING, List, Sequence, Tuple, Dict
+# Import the necessary modules
 from functools import partial
-from PyQt6.QtWidgets import QMainWindow
 import inspect
-from matplotlib.axes import Axes
-from matplotlib.lines import Line2D
-
 import numpy as np
 from iminuit import Minuit, cost
 from numba_stats import bernstein, truncnorm, truncexpon
 from jacobi import propagate
-
+# Import the internal modules
 from agepy import ageplot
 from agepy.interactive import AGEpp
 from agepy.interactive.fitting import AGEFitViewer, AGEFit
-
-
-class ModelDict(TypedDict):
-    signal: List[str]
-    background: List[str]
+# Import modules for type hints
+if TYPE_CHECKING:
+    from PyQt6.QtWidgets import QMainWindow
+    from matplotlib.axes import Axes
+    from matplotlib.lines import Line2D
+    from numpy.typing import NDArray
 
 
 class SpecFit(AGEFit):
@@ -27,14 +25,14 @@ class SpecFit(AGEFit):
     """
 
     def __init__(self,
-        xedges: np.ndarray,
-        binned_data: np.ndarray,
-        unbinned_data: np.ndarray,
+        xedges: NDArray,
+        binned_data: NDArray,
+        unbinned_data: NDArray,
         cost: str = "LeastSquares",
         signal: str = "Gaussian",
         background: str = "Exponential",
-        start: dict = {},
-        limits: dict = {}
+        start: Dict[str, float] = {},
+        limits: Dict[str, Tuple[float, float]] = {}
     ) -> None:
         # Handle the data
         self.xe = xedges
@@ -43,7 +41,7 @@ class SpecFit(AGEFit):
         self.binned_data = binned_data
         self.unbinned_data = unbinned_data
         # Create model dictionary
-        self._models: ModelDict = {
+        self._models = {
             "signal": {
                 "Gaussian": self.gaussian
             },
@@ -65,7 +63,7 @@ class SpecFit(AGEFit):
         self.select_model(signal, background)
         self._minuit = None
 
-    def list_costs(self) -> list[str]:
+    def list_costs(self) -> Sequence[str]:
         costs = ["LeastSquares", "ExtendedBinnedNLL"]
         if self.unbinned_data is not None:
             costs.append("ExtendedUnbinnedNLL")
@@ -91,14 +89,14 @@ class SpecFit(AGEFit):
                 self.unbinned_data, model)
         self._cov = None
 
-    def list_models(self) -> ModelDict:
+    def list_models(self) -> Dict[str, List[str]]:
         models = {
             "signal": list(self._models["signal"].keys()),
             "background": list(self._models["background"].keys())
         }
         return models
 
-    def select_model(self, signal, background) -> None:
+    def select_model(self, signal: str, background: str) -> None:
         if signal not in self._models["signal"]:
             raise ValueError(f"Model {signal} not available.")
         if background not in self._models["background"]:
@@ -254,8 +252,7 @@ def fit_spectrum(
     
     """
     binned_data = np.stack([ydata, yerr**2], axis=-1)
-    #_specfit = SpecFit(xdata, binned_data, data, cost, sig, bkg)
-    _specfit = AGEFit()
+    _specfit = SpecFit(xdata, binned_data, data, cost, sig, bkg)
     if parent is None:
         app = AGEpp(AGEFitViewer, _specfit)
         app.run()

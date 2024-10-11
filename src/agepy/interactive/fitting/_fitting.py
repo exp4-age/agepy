@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import Sequence, Tuple, Union, Dict
 from importlib.resources import path
+import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow, QLayout, QGridLayout, QGroupBox, QComboBox, QLineEdit, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QLayout, QGridLayout, QGroupBox, QComboBox, QLineEdit
 from PyQt6.QtCore import Qt
 
 from agepy import ageplot
@@ -93,6 +94,7 @@ class AGEFitViewer(QMainWindow):
         # Set the fitting backend
         self.backend = backend
         # Add matplotlib canvas
+        #matplotlib.use("Qt5Agg")
         with ageplot.context(["age", "dataviewer"]):
             # Create and add the canvas
             self.canvas = FigureCanvas(Figure())
@@ -211,7 +213,7 @@ class AGEFitViewer(QMainWindow):
         # Plot the new prediction
         with ageplot.context(["age", "dataviewer"]):
             self.mpl_lines = self.backend.plot_prediction(self.ax)
-            self.canvas.draw()
+            self.canvas.draw_idle()
 
     def fit(self):
         # Perform the fit

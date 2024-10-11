@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Union, Sequence
+from typing import TYPE_CHECKING, Union, Sequence
 import importlib.resources as imrsrc
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLayout, QVBoxLayout, QWidget, QSlider
 from PyQt6.QtGui import QIcon, QAction
@@ -8,10 +8,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
-from matplotlib.axes import Axes
 
 from agepy import ageplot
-
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes
 
 class FloatSlider(QSlider):
     floatValueChanged = pyqtSignal(float)

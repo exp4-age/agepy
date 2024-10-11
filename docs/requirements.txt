@@ -39,5 +39,17 @@ notebook
 # h5py https://pypi.org/project/h5py/
 h5py
 
-# PyQt5 https://pypi.org/project/PyQt5/
-PyQt5
+# PyQt6 https://pypi.org/project/PyQt6/
+PyQt6
+
+# iminuit https://pypi.org/project/iminuit/
+iminuit
+
+# numba-stats https://pypi.org/project/numba-stats/
+numba-stats
+
+# jacobi https://pypi.org/project/jacobi/
+jacobi
+
+# lmfit https://pypi.org/project/lmfit/
+lmfit
