@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>FitWindow</class>
+ <widget class="QMainWindow" name="FitWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -64,7 +64,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>751</width>
-                <height>633</height>
+                <height>623</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="layoutParams"/>
@@ -187,7 +187,7 @@
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>28</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>

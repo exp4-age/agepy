@@ -5,7 +5,8 @@ from functools import partial
 import inspect
 import numpy as np
 from iminuit import Minuit, cost
-from numba_stats import bernstein, truncnorm, truncexpon
+from numba_stats import bernstein, truncnorm, truncexpon, uniform, voigt, cruijff, crystalball, crystalball_ex
+import numba as nb
 from jacobi import propagate
 # Import the internal modules
 from agepy import ageplot
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class SpecFit(AGEFit):
-    """
+    """Spectrum fitting class for the AGEFitViewer using iminuit.
 
     """
 
@@ -43,7 +44,11 @@ class SpecFit(AGEFit):
         # Create model dictionary
         self._models = {
             "signal": {
-                "Gaussian": self.gaussian
+                "Gaussian": self.gaussian,
+                "Voigt": self.voigt,
+                "Cruijff": self.cruijff,
+                "CrystalBall": self.crystalball,
+                "2SidedCrystalBall": self.crystalball_ex,
             },
             "background": {
                 "None": None,
@@ -61,7 +66,10 @@ class SpecFit(AGEFit):
         # Initialize the fit
         self._cost_name = cost  # select_cost will be called in select_model
         self.select_model(signal, background)
+        # Initialize the iminuit object
         self._minuit = None
+        # Initialize the placeholder for numerical integration
+        self._numint_cdf = None
 
     def list_costs(self) -> Sequence[str]:
         costs = ["LeastSquares", "ExtendedBinnedNLL"]
@@ -145,6 +153,17 @@ class SpecFit(AGEFit):
         # Update the cost function
         self.select_cost(self._cost_name)
 
+    def _jit_numint_cdf(self) -> None:
+        if self._numint_cdf is not None:
+            return
+        @nb.njit(parallel=True, fastmath={"reassoc", "contract", "arcp"})
+        def numint_cdf(_x, _pdf):
+            y = np.empty_like(_x)
+            for i in nb.prange(len(_x)):
+                y[i] = np.trapz(_pdf[:i+1], x=_x[:i+1])
+            return y
+        self._numint_cdf = numint_cdf
+
     def gaussian(self) -> Tuple[callable, callable, dict, dict]:
         def model(x, s, loc, scale):
             return s * truncnorm.pdf(x, self.xr[0], self.xr[1], loc, scale)
@@ -157,11 +176,79 @@ class SpecFit(AGEFit):
                   "scale": (0.0001 * dx, 0.5 * dx)}
         return model, integral, params, limits
 
+    def voigt(self) -> Tuple[callable, callable, dict, dict]:
+        def model(x, s, gamma, loc, scale):
+            return s * voigt.pdf(x, gamma, loc, scale)
+        self._jit_numint_cdf()
+        _x = np.linspace(self.xr[0], self.xr[1], 1000)
+        def integral(x, s, gamma, loc, scale):
+            _cdf = self._numint_cdf(_x, voigt.pdf(_x, gamma, loc, scale))
+            return s * np.interp(x, _x, _cdf)
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "gamma": 0.1 * dx,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "gamma": (0.0001 * dx, 0.5 * dx),
+                  "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
+        return model, integral, params, limits
+
+    def cruijff(self) -> Tuple[callable, callable, dict, dict]:
+        _x = np.linspace(self.xr[0], self.xr[1], 1000)
+        self._jit_numint_cdf()
+        def model(x, s, beta_left, beta_right, loc, scale_left, scale_right):
+            _cdf = self.numint_cdf(_x, cruijff.density(_x, beta_left,
+                beta_right, loc, scale_left, scale_right))
+            return s / _cdf[-1] * cruijff.density(x, beta_left, beta_right, loc,
+                scale_left, scale_right)
+        def integral(x, s, beta_left, beta_right, loc, scale_left,
+                     scale_right):
+            _cdf = self.numint_cdf(_x, cruijff.density(_x, beta_left,
+                beta_right, loc, scale_left, scale_right))
+            return s  / _cdf[-1] * np.interp(x, _x, _cdf)
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "beta_left": 0.1, "beta_right": 0.1,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1]),
+                  "scale_left": 0.1 * dx, "scale_right": 0.1 * dx}
+        limits = {"s": (0, 1000), "beta_left": (0, 1), "beta_right": (0, 1),
+                    "loc": self.xr, "scale_left": (0.0001 * dx, 0.5 * dx),
+                    "scale_right": (0.0001 * dx, 0.5 * dx)}
+        return model, integral, params, limits
+
+    def crystalball(self) -> Tuple[callable, callable, dict, dict]:
+        def model(x, s, beta, m, loc, scale):
+            return s * crystalball.pdf(x, beta, m, loc, scale)
+        def integral(x, s, beta, m, loc, scale):
+            return s * crystalball.cdf(x, beta, m, loc, scale)
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "beta": 1, "m": 2,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "beta": (0, 5), "m": (1, 10),
+                  "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
+        return model, integral, params, limits
+
+    def crystalball_ex(self) -> Tuple[callable, callable, dict, dict]:
+        def model(x, s, beta_left, m_left, scale_left, beta_right, m_right,
+                  scale_right, loc):
+            return s * crystalball_ex.pdf(x, beta_left, m_left, scale_left,
+                beta_right, m_right, scale_right, loc)
+        def integral(x, s, beta_left, m_left, scale_left, beta_right, m_right,
+                     scale_right, loc):
+            return s * crystalball_ex.cdf(x, beta_left, m_left, scale_left,
+                beta_right, m_right, scale_right, loc)
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "beta_left": 1, "m_left": 2, "scale_left": 0.1 * dx,
+                  "beta_right": 1, "m_right": 2, "scale_right": 0.1 * dx,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1])}
+        limits = {"s": (0, 1000), "beta_left": (0, 5), "m_left": (1, 10),
+                  "scale_left": (0.0001 * dx, 0.5 * dx), "beta_right": (0, 5),
+                  "m_right": (1, 10), "scale_right": (0.0001 * dx, 0.5 * dx),
+                  "loc": self.xr}
+        return model, integral, params, limits
+
     def constant(self) -> Tuple[callable, callable, dict, dict]:
         def model(x, b):
-            return np.full_like(x, b)
+            return b * uniform.pdf(x, self.xr[0], self.xr[1] - self.xr[0])
         def integral(x, b):
-            return b * (x - self.xr[0])
+            return b * uniform.cdf(x, self.xr[0], self.xr[1] - self.xr[0])
         params = {"b": 10}
         limits = {"b": (0, 1000)}
         return model, integral, params, limits
@@ -173,7 +260,7 @@ class SpecFit(AGEFit):
             return b * truncexpon.cdf(x, self.xr[0], self.xr[1], loc, scale)
         params = {"b": 10, "loc_expon": 0, "scale_expon": 1}
         limits = {"b": (0, 1000), "loc_expon": (-1, 0),
-                  "scale_expon": (-1000, 1000)}
+                  "scale_expon": (-100, 100)}
         fixed = {"b": False, "loc_expon": True, "scale_expon": False}
         return model, integral, params, limits
 

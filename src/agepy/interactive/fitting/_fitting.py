@@ -12,10 +12,12 @@ from PyQt6.QtCore import Qt
 
 from agepy import ageplot
 from agepy.interactive import FloatSlider
+from agepy.interactive.fitting.fitwindow import Ui_FitWindow
 
 
 class ParamBox(QGroupBox):
-    """
+    """Parameter box for the AGE Fit Viewer. It contains a slider and
+    line edits for the parameter value and the limits.
     
     """
 
@@ -78,8 +80,8 @@ class ParamBox(QGroupBox):
         return float(self.editValue.text())
 
 
-class AGEFitViewer(QMainWindow):
-    """
+class AGEFitViewer(QMainWindow, Ui_FitWindow):
+    """Window for the interactive fitting.
     
     """
 
@@ -89,8 +91,7 @@ class AGEFitViewer(QMainWindow):
     ) -> None:
         # Setup the QMainWindow
         super().__init__(parent=parent)
-        with path("agepy.interactive.fitting", "fitting.ui") as ui_path:
-            uic.loadUi(str(ui_path), self)
+        self.setupUi(self)
         # Set the fitting backend
         self.backend = backend
         # Add matplotlib canvas
@@ -216,8 +217,12 @@ class AGEFitViewer(QMainWindow):
             self.canvas.draw_idle()
 
     def fit(self):
+        # Indicate that the fit is running
+        self.buttonFit.setEnabled(False)
         # Perform the fit
         self.backend.fit()
+        # Indicate that the fit is done
+        self.buttonFit.setEnabled(True)
         # Show the fit result
         self.textResults.clear()
         self.textResults.setPlainText(self.backend.print_result())
@@ -228,7 +233,8 @@ class AGEFitViewer(QMainWindow):
 
 
 class AGEFit:
-    """
+    """Dummy class for the fitting logic. Most methods need to be
+    overwritten by a subclass.
 
     """
 

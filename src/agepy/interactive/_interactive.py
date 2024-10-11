@@ -8,10 +8,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
-
+# Internal agepy imports
 from agepy import ageplot
+# Import modules for type hinting
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
+
 
 class FloatSlider(QSlider):
     floatValueChanged = pyqtSignal(float)
