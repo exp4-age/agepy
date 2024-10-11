@@ -7,12 +7,13 @@ from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow, QLayout, QGridLayout, QGroupBox, QComboBox, QLineEdit
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QInputDialog, QDialog, QLayout, QGridLayout, QGroupBox, QComboBox, QLineEdit
 from PyQt6.QtCore import Qt
 
 from agepy import ageplot
 from agepy.interactive import FloatSlider
 from agepy.interactive.fitting.fitwindow import Ui_FitWindow
+from agepy.interactive.fitting.labeldialog import Ui_LabelDialog
 
 
 class ParamBox(QGroupBox):
@@ -39,6 +40,11 @@ class ParamBox(QGroupBox):
         layout.addWidget(self.editValue, 0, 1)
         layout.addWidget(self.editLLimit, 1, 0)
         layout.addWidget(self.editULimit, 1, 1)
+        # Add tooltips
+        self.slider.setToolTip("Parameter Value")
+        self.editValue.setToolTip("Parameter Value")
+        self.editLLimit.setToolTip("Lower Limit")
+        self.editULimit.setToolTip("Upper Limit")
 
     def connect_limits(self, callback):
         self.editLLimit.returnPressed.connect(callback)
@@ -137,6 +143,10 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
         self.buttonFit.clicked.connect(self.fit)
         # Add the result text box
         self.textResults.setPlainText(self.backend.print_result())
+        # Connect the menu actions
+        self.actionSetLabels.triggered.connect(self.set_labels)
+        self.actionSetTitle.triggered.connect(self.set_title)
+        self.actionSaveAs.triggered.connect(self.save_as)
         # Draw the initial model
         self.update_prediction()
 
@@ -230,6 +240,35 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
         self.update_gui_params()
         # Update the prediction
         self.update_prediction()
+
+    def set_labels(self):
+        dialog = QDialog(self)
+        dialog.ui = Ui_LabelDialog()
+        dialog.ui.setupUi(dialog)
+        dialog.ui.editXLabel.setText(self.ax.get_xlabel())
+        dialog.ui.editYLabel.setText(self.ax.get_ylabel())
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            with ageplot.context(["age", "dataviewer"]):
+                self.ax.set_xlabel(dialog.ui.editXLabel.text())
+                self.ax.set_ylabel(dialog.ui.editYLabel.text())
+                self.canvas.draw_idle()
+
+    def set_title(self):
+        dialog = QInputDialog(self)
+        #dialog.setWindowTitle("Set Title")
+        #dialog.setLabelText("Title:")
+        dialog.setTextValue(self.ax.get_title())
+        if dialog.exec() == QDialog.DialogCode.Accepted:
+            with ageplot.context(["age", "dataviewer"]):
+                self.ax.set_title(dialog.textValue())
+                self.canvas.draw_idle()
+
+    def save_as(self):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save Figure", "",
+            "PNG Files (*.png);; PDF Files (*.pdf);;All Files (*)")
+        if file_path:
+            self.canvas.figure.savefig(file_path)
 
 
 class AGEFit:

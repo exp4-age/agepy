@@ -1,5 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, List, Sequence, Tuple, Dict
+import warnings
 # Import the necessary modules
 from functools import partial
 import inspect
@@ -153,6 +154,56 @@ class SpecFit(AGEFit):
         # Update the cost function
         self.select_cost(self._cost_name)
 
+    def fit(self) -> None:
+        self._minuit = Minuit(self._cost, **self._params)
+        for name, limits in self._limits.items():
+            self._minuit.limits[name] = limits
+        self._minuit.migrad()
+        if not self._minuit.valid:
+            self._minuit.migrad()
+        for par in self._params:
+            self._params[par] = self._minuit.values[par]
+        if self._minuit.accurate:
+            self._cov = np.array(self._minuit.covariance)
+        else:
+            self._cov = None
+
+    def plot_data(self, ax: Axes) -> None:
+        ax.errorbar(self.x, self.binned_data[:, 0],
+                    yerr=np.sqrt(self.binned_data[:, 1]), fmt="s",
+                    color=ageplot.colors[0])
+        ax.set_xlim(*self.xr)
+        ax.set_title("Spectrum Fit (iminuit)")
+
+    def plot_prediction(self, ax: Axes) -> Sequence[Line2D]:
+        dx = 1
+        if self._cost_name != "LeastSquares":
+            dx = self.xe[1] - self.xe[0]
+        x = np.linspace(self.xr[0], self.xr[1], 1000)
+        params = np.array([self._params[par] for par in self._params])
+        cov = self._cov
+        if cov is None:
+            y = self._model(x, *params)
+        else:
+            y, ycov = propagate(lambda p: self._model(x, *p), params, cov)
+        # Normalize the prediction
+        y *= dx
+        # Draw the prediction
+        pred_line, = ax.plot(x, y, color=ageplot.colors[1])
+        mpl_lines = [pred_line]
+        # Draw 1 sigma error band
+        if cov is not None:
+            yerr = np.sqrt(np.diag(ycov)) * dx
+            pred_errband = ax.fill_between(x, y - yerr, y + yerr,
+                facecolor=ageplot.colors[1], alpha=0.5)
+            mpl_lines.append(pred_errband)
+        return mpl_lines
+
+    def print_result(self) -> str:
+        if self._minuit is None:
+            return "No fit performed."
+        return self._minuit.__str__()
+
     def _jit_numint_cdf(self) -> None:
         if self._numint_cdf is not None:
             return
@@ -195,13 +246,13 @@ class SpecFit(AGEFit):
         _x = np.linspace(self.xr[0], self.xr[1], 1000)
         self._jit_numint_cdf()
         def model(x, s, beta_left, beta_right, loc, scale_left, scale_right):
-            _cdf = self.numint_cdf(_x, cruijff.density(_x, beta_left,
+            _cdf = self._numint_cdf(_x, cruijff.density(_x, beta_left,
                 beta_right, loc, scale_left, scale_right))
             return s / _cdf[-1] * cruijff.density(x, beta_left, beta_right, loc,
                 scale_left, scale_right)
         def integral(x, s, beta_left, beta_right, loc, scale_left,
                      scale_right):
-            _cdf = self.numint_cdf(_x, cruijff.density(_x, beta_left,
+            _cdf = self._numint_cdf(_x, cruijff.density(_x, beta_left,
                 beta_right, loc, scale_left, scale_right))
             return s  / _cdf[-1] * np.interp(x, _x, _cdf)
         dx = self.xr[1] - self.xr[0]
@@ -272,74 +323,101 @@ class SpecFit(AGEFit):
         params = {f"a{i}": 1 for i in range(deg+1)}
         limits = {f"a{i}": (-1000, 1000) for i in range(deg+1)}
         return model, integral, params, limits
-
-    def fit(self) -> None:
-        self._minuit = Minuit(self._cost, **self._params)
-        for name, limits in self._limits.items():
-            self._minuit.limits[name] = limits
-        self._minuit.migrad()
-        if not self._minuit.valid:
-            self._minuit.migrad()
-        for par in self._params:
-            self._params[par] = self._minuit.values[par]
-        if self._minuit.accurate:
-            self._cov = np.array(self._minuit.covariance)
-        else:
-            self._cov = None
-
-    def plot_data(self, ax: Axes) -> None:
-        ax.errorbar(self.x, self.binned_data[:, 0],
-                    yerr=np.sqrt(self.binned_data[:, 1]), fmt="s",
-                    color=ageplot.colors[0])
-        ax.set_xlim(*self.xr)
-        ax.set_title("Spectrum Fit (iminuit)")
-
-    def plot_prediction(self, ax: Axes) -> Sequence[Line2D]:
-        dx = 1
-        if self._cost_name != "LeastSquares":
-            dx = self.xe[1] - self.xe[0]
-        x = np.linspace(self.xr[0], self.xr[1], 1000)
-        params = np.array([self._params[par] for par in self._params])
-        cov = self._cov
-        if cov is None:
-            y = self._model(x, *params)
-        else:
-            y, ycov = propagate(lambda p: self._model(x, *p), params, cov)
-        # Normalize the prediction
-        y *= dx
-        # Draw the prediction
-        pred_line, = ax.plot(x, y, color=ageplot.colors[1])
-        mpl_lines = [pred_line]
-        # Draw 1 sigma error band
-        if cov is not None:
-            yerr = np.sqrt(np.diag(ycov)) * dx
-            pred_errband = ax.fill_between(x, y - yerr, y + yerr,
-                facecolor=ageplot.colors[1], alpha=0.5)
-            mpl_lines.append(pred_errband)
-        return mpl_lines
-
-    def print_result(self) -> str:
-        if self._minuit is None:
-            return "No fit performed."
-        return self._minuit.__str__()
         
 
 def fit_spectrum(
-    xdata: np.ndarray = None,
-    ydata: np.ndarray = None,
-    yerr: np.ndarray = None,
-    data: np.ndarray = None,
-    cost: str = "LeastSquares",
+    x: NDArray,
+    binned_data: NDArray = None,
+    uncertainties: NDArray = None,
+    unbinned_data: NDArray = None,
+    cost: str = "ExtendedBinnedNLL",
     sig: str = "Gaussian",
     bkg: str = "Exponential",
-    start: dict = {},
+    start: Dict[str, float] = {},
+    limits: Dict[str, Tuple[float, float]] = {},
     parent: QMainWindow = None
 ) -> None:
+    """Interactively fit a spectrum with a signal and background
+    component using iminuit.
+
+    iminuit provides accurate error estimates for the fit parameters
+    and when using the "Extended" cost functions the yield parameters
+    ``s`` and ``b`` are estimates of the number of signal and background
+    events in the spectrum.  
+
+    Parameters
+    ----------
+    x : NDArray
+        The x values of the spectrum. Can be either the bin edges or
+        bin centers.
+    binned_data : NDArray, optional
+        Binned 1d (histogram) data. Must be of length ``len(x)`` or
+        ``len(x) - 1``. At least one of ``binned_data`` or
+        ``unbinned_data`` must be provided.
+    uncertainties : NDArray, optional
+        Uncertainties of the binned data. Must be of length
+        ``len(binned_data)``. If not provided, Poisson uncertainties
+        are assumed.
+    unbinned_data : NDArray, optional
+        Unbinned 1d data. If provided, the ExtendedUnbinnedNLL cost
+        function becomes available.
+    cost : str, optional
+        The cost function to use. Default is "ExtendedBinnedNLL".
+    sig : str, optional
+        The signal model to use. Default is "Gaussian".
+    bkg : str, optional
+        The background model to use. Default is "Exponential".
+    start : Dict[str, float], optional
+        Starting values for the fit parameters. The keys must match
+        the parameter names of the selected signal and background
+        models. Parameter names can be found in ``SpecFit``. Default is
+        an empty dictionary.
+    limits : Dict[str, Tuple[float, float]], optional
+        Limits for the fit parameters. The keys must match the parameter
+        names of the selected signal and background models. Parameter
+        names can be found in ``SpecFit``. Default is an empty dictionary.
+    parent : QMainWindow, optional
+        The parent window for the fit viewer. If not provided, a new
+        application is created and run. Default is ``None``.
+
     """
-    
-    """
-    binned_data = np.stack([ydata, yerr**2], axis=-1)
-    _specfit = SpecFit(xdata, binned_data, data, cost, sig, bkg)
+    # Check if data is provided
+    if binned_data is None and unbinned_data is None:
+        raise ValueError("Either binned or unbinned data must be provided.")
+    # Check if x values are equally spaced
+    if not np.allclose(np.diff(x), np.diff(x)[0]):
+        raise ValueError("x values must be equally spaced.")
+    if binned_data is not None:
+        # Check if x values are edges or centers
+        if len(x) == len(binned_data):
+            x = 0.5 * (x[1:] + x[:-1])
+        elif len(x) != len(binned_data) + 1:
+            raise ValueError("x values must be of length len(binned_data) or "
+                             "len(binned_data) + 1, if binned data is "
+                             "provided.")
+        # Check if uncertainties have the correct shape
+        if uncertainties is not None:
+            if len(uncertainties) != len(binned_data):
+                raise ValueError("Uncertainties must be of same length as "
+                                 "the binned data.")
+            else:
+                binned_data = np.stack([binned_data, uncertainties**2],
+                                       axis=-1)
+        else:
+            warnings.warn("Per bin Poisson uncertainties are assumed.")
+    else:
+        if uncertainties is not None:
+            warnings.warn("Uncertainties are ignored for unbinned data.")
+    if unbinned_data is not None:
+        # Histogram the data
+        n = np.histogram(unbinned_data, bins=x)[0]
+        if binned_data is None:
+            binned_data = np.stack([n, n], axis=-1)
+        elif not np.allclose(n, binned_data[:, 0]):
+            raise ValueError("Unbinned data is not consistent with binned "
+                             "data.")
+    _specfit = SpecFit(x, binned_data, unbinned_data, cost=cost, signal=sig,
+                       background=bkg, start=start, limits=limits)
     if parent is None:
         app = AGEpp(AGEFitViewer, _specfit)
         app.run()

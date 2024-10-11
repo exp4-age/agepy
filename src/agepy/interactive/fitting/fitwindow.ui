@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1600</width>
-    <height>900</height>
+    <height>1000</height>
    </rect>
   </property>
   <property name="font">
@@ -64,7 +64,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>751</width>
-                <height>623</height>
+                <height>733</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="layoutParams"/>
@@ -187,10 +187,34 @@
      <x>0</x>
      <y>0</y>
      <width>1600</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menumatplotlib">
+    <property name="title">
+     <string>matplotlib</string>
+    </property>
+    <addaction name="actionSetLabels"/>
+    <addaction name="actionSetTitle"/>
+    <addaction name="actionSaveAs"/>
+   </widget>
+   <addaction name="menumatplotlib"/>
   </widget>
+  <action name="actionSetLabels">
+   <property name="text">
+    <string>Set Axes Labels</string>
+   </property>
+  </action>
+  <action name="actionSetTitle">
+   <property name="text">
+    <string>Set Axes Title</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save Figure As...</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
