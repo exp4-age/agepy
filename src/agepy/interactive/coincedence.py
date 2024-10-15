@@ -1,21 +1,16 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from PyQt5.QtCore import pyqtSignal
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backend_bases import MouseEvent
-from matplotlib.widgets import RectangleSelector
-import matplotlib.pyplot as plt
-import numpy as np
-
+# Import internal modules
 from agepy.interactive import AGEDataViewer
 from agepy import ageplot
-
+# Import modules for type hinting
 if TYPE_CHECKING:
     from agepy.spec.coincidence import CoincMap
 
 
 class AGECoincViewer(AGEDataViewer):
-    """Show all spectra in a scan.
+    """Interactive viewer for CoincMap objects.
 
     """
 

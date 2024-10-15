@@ -15,3 +15,4 @@ listed and documented here.
    ageplot
    spec
    mag
+   interactive

@@ -1,17 +1,31 @@
 from __future__ import annotations
-from typing import Sequence, Tuple, Union, Dict
-from matplotlib.figure import Figure
-from matplotlib.axes import Axes
-from matplotlib.lines import Line2D
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QInputDialog, QGridLayout
-from PyQt6.QtWidgets import QLayout, QGroupBox, QComboBox, QLineEdit, QDialog
+from typing import TYPE_CHECKING
+# Import PyQt6 modules
+from PyQt6.QtWidgets import (
+    QMainWindow,
+    QDialog,
+    QFileDialog,
+    QInputDialog,
+    QLayout,
+    QGridLayout,
+    QGroupBox,
+    QComboBox,
+    QLineEdit
+)
 from PyQt6.QtCore import Qt
-
+# Import matplotlib modules
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+# Import internal modules
 from agepy import ageplot
 from agepy.interactive import FloatSlider
 from agepy.interactive.fitting.fitwindow import Ui_FitWindow
 from agepy.interactive.fitting.labeldialog import Ui_LabelDialog
+# Import modules for type hinting
+if TYPE_CHECKING:
+    from typing import Union, Sequence, Dict, Tuple
+    from matplotlib.axes import Axes
+    from matplotlib.lines import Line2D
 
 
 class ParamBox(QGroupBox):

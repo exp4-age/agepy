@@ -1,13 +1,22 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import warnings
-# Import the necessary modules
 from functools import partial
 import inspect
+# Import the modules for the fitting
 import numpy as np
 from iminuit import Minuit, cost
-from numba_stats import bernstein, truncnorm, truncexpon, uniform, voigt
-from numba_stats import cruijff, crystalball, crystalball_ex, qgaussian
+from numba_stats import (
+    bernstein,
+    truncnorm,
+    truncexpon,
+    uniform,
+    voigt,
+    cruijff,
+    crystalball,
+    crystalball_ex,
+    qgaussian
+)
 import numba as nb
 from jacobi import propagate
 # Import the internal modules
@@ -21,6 +30,113 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.lines import Line2D
     from numpy.typing import NDArray, ArrayLike
+
+
+def fit_spectrum(
+    x: NDArray,
+    y: NDArray,
+    yerr: NDArray = None,
+    cost: str = "LeastSquares",
+    sig: str = "Gaussian",
+    bkg: str = "Exponential",
+    start: Dict[str, float] = {},
+    limits: Dict[str, Tuple[float, float]] = {},
+    parent: QMainWindow = None
+) -> None:
+    """Interactively fit a spectrum with a signal and background
+    component using iminuit.
+
+    iminuit provides accurate error estimates for the fit parameters
+    and when using the "Extended" cost functions the yield parameters
+    ``s`` and ``b`` are estimates of the number of signal and background
+    events in the spectrum.
+
+    Parameters
+    ----------
+    x : NDArray
+        The x values of the spectrum. Can be either the bin edges, bin
+        centers or unevenly spaced values. The NLL cost functions
+        require bin edges or bin centers.
+    y : NDArray
+        Either the bin contents, unbinned data points or the y values.
+        The unbinned NLL cost function requires unbinned data points.
+    yerr : NDArray, optional
+        The uncertainties of the y values. Should not be provided for
+        unbinned data points, but needs to be provided for unevenly
+        spaced x values. If ``y`` is the bin contents and ``yerr`` is
+        ``None``, per bin Poisson uncertainties are assumed.
+    cost : str, optional
+        The cost function to use. Default is "LeastSquares".
+    sig : str, optional
+        The signal model to use. Default is "Gaussian".
+    bkg : str, optional
+        The background model to use. Default is "Exponential".
+    start : Dict[str, float], optional
+        Starting values for the fit parameters. The keys must match
+        the parameter names of the selected signal and background
+        models. Parameter names can be found in ``SpecFit``. Default is
+        an empty dictionary.
+    limits : Dict[str, Tuple[float, float]], optional
+        Limits for the fit parameters. The keys must match the parameter
+        names of the selected signal and background models. Parameter
+        names can be found in ``SpecFit``. Default is an empty dictionary.
+    parent : QMainWindow, optional
+        The parent window for the fit viewer. If not provided, a new
+        application is created and run. Default is ``None``.
+
+    """
+    _fit = SpecFit(x, y, yerr, cost, (sig, bkg), start=start, limits=limits)
+    if parent is None:
+        app = AGEpp(AGEFitViewer, _fit)
+        app.run()
+    else:
+        fitviewer = AGEFitViewer(_fit, parent)
+        fitviewer.show()
+
+
+def fit_calibration(
+    x: NDArray,
+    y: NDArray,
+    yerr: NDArray,
+    cost: str = "LeastSquares",
+    model: str = "Linear",
+    start: Dict[str, float] = {},
+    limits: Dict[str, Tuple[float, float]] = {},
+    parent: QMainWindow = None
+) -> None:
+    """Interactively fit a calibration curve using iminuit.
+
+    Parameters
+    ----------
+    x : NDArray
+        The x values of the calibration curve.
+    y : NDArray
+        The y values of the calibration curve.
+    yerr : NDArray, optional
+        The uncertainties of the y values.
+    cost : str, optional
+        The cost function to use. Default is "LeastSquares".
+    model : str, optional
+        The model to use. Default is "Constant".
+    start : Dict[str, float], optional
+        Starting values for the fit parameters. The keys must match
+        the parameter names of the selected model Default is
+        an empty dictionary.
+    limits : Dict[str, Tuple[float, float]], optional
+        Limits for the fit parameters. The keys must match the parameter
+        names of the selected model. Default is an empty dictionary.
+    parent : QMainWindow, optional
+        The parent window for the fit viewer. If not provided, a new
+        application is created and run. Default is ``None``.
+
+    """
+    _fit = CalibrationFit(x, y, yerr, cost, model, start=start, limits=limits)
+    if parent is None:
+        app = AGEpp(AGEFitViewer, _fit)
+        app.run()
+    else:
+        fitviewer = AGEFitViewer(_fit, parent)
+        fitviewer.show()
 
 
 class IminuitBackend(AGEFitBackend):
@@ -545,110 +661,3 @@ class CalibrationFit(IminuitBackend):
             return a3 * x**3 + a2 * x**2 + a1 * x + a0
 
         return model, None, params, limits
-
-
-def fit_spectrum(
-    x: NDArray,
-    y: NDArray,
-    yerr: NDArray = None,
-    cost: str = "LeastSquares",
-    sig: str = "Gaussian",
-    bkg: str = "Exponential",
-    start: Dict[str, float] = {},
-    limits: Dict[str, Tuple[float, float]] = {},
-    parent: QMainWindow = None
-) -> None:
-    """Interactively fit a spectrum with a signal and background
-    component using iminuit.
-
-    iminuit provides accurate error estimates for the fit parameters
-    and when using the "Extended" cost functions the yield parameters
-    ``s`` and ``b`` are estimates of the number of signal and background
-    events in the spectrum.
-
-    Parameters
-    ----------
-    x : NDArray
-        The x values of the spectrum. Can be either the bin edges, bin
-        centers or unevenly spaced values. The NLL cost functions
-        require bin edges or bin centers.
-    y : NDArray
-        Either the bin contents, unbinned data points or the y values.
-        The unbinned NLL cost function requires unbinned data points.
-    yerr : NDArray, optional
-        The uncertainties of the y values. Should not be provided for
-        unbinned data points, but needs to be provided for unevenly
-        spaced x values. If ``y`` is the bin contents and ``yerr`` is
-        ``None``, per bin Poisson uncertainties are assumed.
-    cost : str, optional
-        The cost function to use. Default is "LeastSquares".
-    sig : str, optional
-        The signal model to use. Default is "Gaussian".
-    bkg : str, optional
-        The background model to use. Default is "Exponential".
-    start : Dict[str, float], optional
-        Starting values for the fit parameters. The keys must match
-        the parameter names of the selected signal and background
-        models. Parameter names can be found in ``SpecFit``. Default is
-        an empty dictionary.
-    limits : Dict[str, Tuple[float, float]], optional
-        Limits for the fit parameters. The keys must match the parameter
-        names of the selected signal and background models. Parameter
-        names can be found in ``SpecFit``. Default is an empty dictionary.
-    parent : QMainWindow, optional
-        The parent window for the fit viewer. If not provided, a new
-        application is created and run. Default is ``None``.
-
-    """
-    _fit = SpecFit(x, y, yerr, cost, (sig, bkg), start=start, limits=limits)
-    if parent is None:
-        app = AGEpp(AGEFitViewer, _fit)
-        app.run()
-    else:
-        fitviewer = AGEFitViewer(_fit, parent)
-        fitviewer.show()
-
-
-def fit_calibration(
-    x: NDArray,
-    y: NDArray,
-    yerr: NDArray,
-    cost: str = "LeastSquares",
-    model: str = "Linear",
-    start: Dict[str, float] = {},
-    limits: Dict[str, Tuple[float, float]] = {},
-    parent: QMainWindow = None
-) -> None:
-    """Interactively fit a calibration curve using iminuit.
-
-    Parameters
-    ----------
-    x : NDArray
-        The x values of the calibration curve.
-    y : NDArray
-        The y values of the calibration curve.
-    yerr : NDArray, optional
-        The uncertainties of the y values.
-    cost : str, optional
-        The cost function to use. Default is "LeastSquares".
-    model : str, optional
-        The model to use. Default is "Constant".
-    start : Dict[str, float], optional
-        Starting values for the fit parameters. The keys must match
-        the parameter names of the selected model Default is
-        an empty dictionary.
-    limits : Dict[str, Tuple[float, float]], optional
-        Limits for the fit parameters. The keys must match the parameter
-        names of the selected model. Default is an empty dictionary.
-    parent : QMainWindow, optional
-        The parent window for the fit viewer. If not provided, a new
-        application is created and run. Default is ``None``.
-
-    """
-    _fit = CalibrationFit(x, y, yerr, cost, model, start=start, limits=limits)
-    if parent is None:
-        app = AGEpp(AGEFitViewer, _fit)
-        app.run()
-    else:
-        fitviewer = AGEFitViewer(_fit, parent)
-        fitviewer.show()

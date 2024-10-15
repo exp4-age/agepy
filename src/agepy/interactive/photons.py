@@ -1,10 +1,12 @@
 from __future__ import annotations
-from PyQt5.QtWidgets import QPushButton, QStyle
-import matplotlib.pyplot as plt
+from typing import TYPE_CHECKING
 import numpy as np
-
+# Import internal modules
 from agepy.interactive import AGEDataViewer
 from agepy import ageplot
+# Import modules for type hinting
+if TYPE_CHECKING:
+    from agepy.spec.photons import Scan
 
 
 class AGEScanViewer(AGEDataViewer):
@@ -12,7 +14,7 @@ class AGEScanViewer(AGEDataViewer):
 
     """
 
-    def __init__(self, scan, bins: int = 512) -> None:
+    def __init__(self, scan: Scan, bins: int = 512) -> None:
         super().__init__()
         # Add plot to canvas
         self.add_plot()

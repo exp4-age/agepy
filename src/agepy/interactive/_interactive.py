@@ -3,13 +3,21 @@ from typing import TYPE_CHECKING
 # Import importlib.resources for getting the icon paths
 import importlib.resources as imrsrc
 # Import PyQt6 modules
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLayout, QVBoxLayout
-from PyQt6.QtWidgets import QWidget, QSlider
+from PyQt6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QLayout,
+    QVBoxLayout,
+    QWidget,
+    QSlider
+)
 from PyQt6.QtGui import QIcon, QAction
 from PyQt6.QtCore import pyqtSignal
 # Import matplotlib modules
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
+from matplotlib.backends.backend_qt5agg import (
+    FigureCanvasQTAgg,
+    NavigationToolbar2QT
+)
 from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
 # Internal agepy imports
