@@ -31,6 +31,11 @@ if TYPE_CHECKING:
     from matplotlib.lines import Line2D
     from numpy.typing import NDArray, ArrayLike
 
+__all__ = [
+    "fit_spectrum",
+    "fit_calibration"
+]
+
 
 def fit_spectrum(
     x: NDArray,

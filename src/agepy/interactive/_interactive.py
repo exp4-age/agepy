@@ -27,6 +27,12 @@ if TYPE_CHECKING:
     from typing import Union, Sequence
     from matplotlib.axes import Axes
 
+__all__ = [
+    "AGEDataViewer",
+    "AGEpp",
+    "FloatSlider"
+]
+
 
 class FloatSlider(QSlider):
     floatValueChanged = pyqtSignal(float)

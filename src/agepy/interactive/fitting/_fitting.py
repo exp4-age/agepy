@@ -27,6 +27,11 @@ if TYPE_CHECKING:
     from matplotlib.axes import Axes
     from matplotlib.lines import Line2D
 
+__all__ = [
+    "AGEFitViewer",
+    "AGEFitBackend"
+]
+
 
 class ParamBox(QGroupBox):
     """Parameter box for the AGE Fit Viewer. It contains a slider and
