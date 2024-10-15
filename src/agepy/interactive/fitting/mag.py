@@ -11,10 +11,10 @@ from lmfit import Model, Parameter
 
 from agepy import ageplot
 from agepy.interactive import AGEpp
-from agepy.interactive.fitting import AGEFitViewer, AGEFit
+from agepy.interactive.fitting import AGEFitViewer, AGEFitBackend
 
 
-class MagFit(AGEFit):
+class MagFit(AGEFitBackend):
     """
 
     """

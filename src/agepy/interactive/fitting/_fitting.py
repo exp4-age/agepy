@@ -271,13 +271,14 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
             self.canvas.figure.savefig(file_path)
 
 
-class AGEFit:
+class AGEFitBackend:
     """Dummy class for the fitting logic. Most methods need to be
     overwritten by a subclass.
 
     """
 
     def __init__(self) -> None:
+        self._models = {"model": {"Not implemented!": None}}
         self.select_model("Not implemented!")
         self.select_cost("Not implemented!")
 
@@ -290,8 +291,11 @@ class AGEFit:
     def select_cost(self, name: str) -> None:
         self._cost_name = name
 
-    def list_models(self) -> Union[Sequence[str], Dict[str, Sequence[str]]]:
-        return ["Not implemented!"]
+    def list_models(self) -> Dict[str, Sequence[str]]:
+        models = {}
+        for model_type in self._models:
+            models[model_type] = list(self._models[model_type].keys())
+        return models
 
     def which_model(self) -> Union[str, Dict[str, str]]:
         return self._model_name
