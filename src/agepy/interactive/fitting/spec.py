@@ -1,12 +1,13 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Sequence, Tuple, Dict, Union
+from typing import TYPE_CHECKING
 import warnings
 # Import the necessary modules
 from functools import partial
 import inspect
 import numpy as np
 from iminuit import Minuit, cost
-from numba_stats import bernstein, truncnorm, truncexpon, uniform, voigt, cruijff, crystalball, crystalball_ex
+from numba_stats import bernstein, truncnorm, truncexpon, uniform, voigt
+from numba_stats import cruijff, crystalball, crystalball_ex
 import numba as nb
 from jacobi import propagate
 # Import the internal modules
@@ -15,6 +16,7 @@ from agepy.interactive import AGEpp
 from agepy.interactive.fitting import AGEFitViewer, AGEFitBackend
 # Import modules for type hints
 if TYPE_CHECKING:
+    from typing import Sequence, Tuple, Dict, Union
     from PyQt6.QtWidgets import QMainWindow
     from matplotlib.axes import Axes
     from matplotlib.lines import Line2D
@@ -23,7 +25,8 @@ if TYPE_CHECKING:
 
 class IminuitBackend(AGEFitBackend):
 
-    def __init__(self,
+    def __init__(
+        self,
         x: NDArray,
         y: NDArray,
         yerr: NDArray,
@@ -117,8 +120,8 @@ class IminuitBackend(AGEFitBackend):
         # Draw 1 sigma error band
         if cov is not None:
             yerr = np.sqrt(np.diag(ycov)) * dx
-            pred_errband = ax.fill_between(x, y - yerr, y + yerr,
-                facecolor=ageplot.colors[1], alpha=0.5)
+            pred_errband = ax.fill_between(
+                x, y - yerr, y + yerr, facecolor=ageplot.colors[1], alpha=0.5)
             mpl_lines.append(pred_errband)
         return mpl_lines
 
@@ -130,84 +133,91 @@ class IminuitBackend(AGEFitBackend):
     def _jit_numint_cdf(self) -> None:
         if self._numint_cdf is not None:
             return
+        # jit compile the numerical integration of the pdf
+
         @nb.njit(parallel=True, fastmath={"reassoc", "contract", "arcp"})
         def numint_cdf(_x, _pdf):
             y = np.empty_like(_x)
             for i in nb.prange(len(_x)):
                 y[i] = np.trapz(_pdf[:i+1], x=_x[:i+1])
             return y
+
         self._numint_cdf = numint_cdf
 
     def gaussian(self) -> Tuple[callable, callable, dict, dict]:
-        def model(x, s, loc, scale):
-            return s * truncnorm.pdf(x, self.xr[0], self.xr[1], loc, scale)
-        def integral(x, s, loc, scale):
-            return s * truncnorm.cdf(x, self.xr[0], self.xr[1], loc, scale)
         dx = self.xr[1] - self.xr[0]
         params = {"s": 10, "loc": 0.5 * (self.xr[0] + self.xr[1]),
                   "scale": 0.1 * dx}
         limits = {"s": (0, 1000), "loc": self.xr,
                   "scale": (0.0001 * dx, 0.5 * dx)}
+
+        def model(x, s, loc, scale):
+            return s * truncnorm.pdf(x, self.xr[0], self.xr[1], loc, scale)
+
+        def integral(x, s, loc, scale):
+            return s * truncnorm.cdf(x, self.xr[0], self.xr[1], loc, scale)
+
         return model, integral, params, limits
 
     def voigt(self) -> Tuple[callable, callable, dict, dict]:
-        def model(x, s, gamma, loc, scale):
-            return s * voigt.pdf(x, gamma, loc, scale)
-        self._jit_numint_cdf()
-        _x = np.linspace(self.xr[0], self.xr[1], 1000)
-        def integral(x, s, gamma, loc, scale):
-            _cdf = self._numint_cdf(_x, voigt.pdf(_x, gamma, loc, scale))
-            return s * np.interp(x, _x, _cdf)
         dx = self.xr[1] - self.xr[0]
         params = {"s": 10, "gamma": 0.1 * dx,
                   "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
         limits = {"s": (0, 1000), "gamma": (0.0001 * dx, 0.5 * dx),
                   "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
+        self._jit_numint_cdf()
+        _x = np.linspace(self.xr[0], self.xr[1], 1000)
+
+        def model(x, s, gamma, loc, scale):
+            return s * voigt.pdf(x, gamma, loc, scale)
+
+        def integral(x, s, gamma, loc, scale):
+            _cdf = self._numint_cdf(_x, voigt.pdf(_x, gamma, loc, scale))
+            return s * np.interp(x, _x, _cdf)
+
         return model, integral, params, limits
 
     def cruijff(self) -> Tuple[callable, callable, dict, dict]:
-        _x = np.linspace(self.xr[0], self.xr[1], 1000)
-        self._jit_numint_cdf()
-        def model(x, s, beta_left, beta_right, loc, scale_left, scale_right):
-            _cdf = self._numint_cdf(_x, cruijff.density(_x, beta_left,
-                beta_right, loc, scale_left, scale_right))
-            return s / _cdf[-1] * cruijff.density(x, beta_left, beta_right, loc,
-                scale_left, scale_right)
-        def integral(x, s, beta_left, beta_right, loc, scale_left,
-                     scale_right):
-            _cdf = self._numint_cdf(_x, cruijff.density(_x, beta_left,
-                beta_right, loc, scale_left, scale_right))
-            return s  / _cdf[-1] * np.interp(x, _x, _cdf)
         dx = self.xr[1] - self.xr[0]
         params = {"s": 10, "beta_left": 0.1, "beta_right": 0.1,
                   "loc": 0.5 * (self.xr[0] + self.xr[1]),
                   "scale_left": 0.1 * dx, "scale_right": 0.1 * dx}
         limits = {"s": (0, 1000), "beta_left": (0, 1), "beta_right": (0, 1),
-                    "loc": self.xr, "scale_left": (0.0001 * dx, 0.5 * dx),
-                    "scale_right": (0.0001 * dx, 0.5 * dx)}
+                  "loc": self.xr, "scale_left": (0.0001 * dx, 0.5 * dx),
+                  "scale_right": (0.0001 * dx, 0.5 * dx)}
+        _x = np.linspace(self.xr[0], self.xr[1], 1000)
+        self._jit_numint_cdf()
+
+        def model(x, s, beta_left, beta_right, loc, scale_left, scale_right):
+            _cdf = self._numint_cdf(_x, cruijff.density(
+                _x, beta_left, beta_right, loc, scale_left, scale_right))
+            return s / _cdf[-1] * cruijff.density(
+                x, beta_left, beta_right, loc, scale_left, scale_right)
+
+        def integral(x, s, beta_left, beta_right, loc, scale_left,
+                     scale_right):
+            _cdf = self._numint_cdf(_x, cruijff.density(
+                _x, beta_left, beta_right, loc, scale_left, scale_right))
+            return s / _cdf[-1] * np.interp(x, _x, _cdf)
+
         return model, integral, params, limits
 
     def crystalball(self) -> Tuple[callable, callable, dict, dict]:
-        def model(x, s, beta, m, loc, scale):
-            return s * crystalball.pdf(x, beta, m, loc, scale)
-        def integral(x, s, beta, m, loc, scale):
-            return s * crystalball.cdf(x, beta, m, loc, scale)
         dx = self.xr[1] - self.xr[0]
         params = {"s": 10, "beta": 1, "m": 2,
                   "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
         limits = {"s": (0, 1000), "beta": (0, 5), "m": (1, 10),
                   "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
+
+        def model(x, s, beta, m, loc, scale):
+            return s * crystalball.pdf(x, beta, m, loc, scale)
+
+        def integral(x, s, beta, m, loc, scale):
+            return s * crystalball.cdf(x, beta, m, loc, scale)
+
         return model, integral, params, limits
 
     def crystalball_ex(self) -> Tuple[callable, callable, dict, dict]:
-        def model(x, s, beta_left, m_left, scale_left, beta_right, m_right,
-                  scale_right, loc):
-            return s * crystalball_ex.pdf(x, beta_left, m_left, scale_left,
-                beta_right, m_right, scale_right, loc)
-        def integral(x, s, beta_left, m_left, scale_left, beta_right, m_right,
-                     scale_right, loc):
-            return s * crystalball_ex.cdf(x, beta_left, m_left, scale_left,
-                beta_right, m_right, scale_right, loc)
         dx = self.xr[1] - self.xr[0]
         params = {"s": 10, "beta_left": 1, "m_left": 2, "scale_left": 0.1 * dx,
                   "beta_right": 1, "m_right": 2, "scale_right": 0.1 * dx,
@@ -216,35 +226,56 @@ class IminuitBackend(AGEFitBackend):
                   "scale_left": (0.0001 * dx, 0.5 * dx), "beta_right": (0, 5),
                   "m_right": (1, 10), "scale_right": (0.0001 * dx, 0.5 * dx),
                   "loc": self.xr}
+
+        def model(x, s, beta_left, m_left, scale_left, beta_right, m_right,
+                  scale_right, loc):
+            return s * crystalball_ex.pdf(
+                x, beta_left, m_left, scale_left, beta_right, m_right,
+                scale_right, loc)
+
+        def integral(x, s, beta_left, m_left, scale_left, beta_right, m_right,
+                     scale_right, loc):
+            return s * crystalball_ex.cdf(
+                x, beta_left, m_left, scale_left, beta_right, m_right,
+                scale_right, loc)
+
         return model, integral, params, limits
 
     def constant(self) -> Tuple[callable, callable, dict, dict]:
-        def model(x, b):
-            return b * uniform.pdf(x, self.xr[0], self.xr[1] - self.xr[0])
-        def integral(x, b):
-            return b * uniform.cdf(x, self.xr[0], self.xr[1] - self.xr[0])
         params = {"b": 10}
         limits = {"b": (0, 1000)}
+
+        def model(x, b):
+            return b * uniform.pdf(x, self.xr[0], self.xr[1] - self.xr[0])
+
+        def integral(x, b):
+            return b * uniform.cdf(x, self.xr[0], self.xr[1] - self.xr[0])
+
         return model, integral, params, limits
 
     def exponential(self) -> Tuple[callable, callable, dict, dict]:
-        def model(x, b, loc, scale):
-            return b * truncexpon.pdf(x, self.xr[0], self.xr[1], loc, scale)
-        def integral(x, b, loc, scale):
-            return b * truncexpon.cdf(x, self.xr[0], self.xr[1], loc, scale)
         params = {"b": 10, "loc_expon": 0, "scale_expon": 1}
         limits = {"b": (0, 1000), "loc_expon": (-1, 0),
                   "scale_expon": (-100, 100)}
-        fixed = {"b": False, "loc_expon": True, "scale_expon": False}
+
+        def model(x, b, loc, scale):
+            return b * truncexpon.pdf(x, self.xr[0], self.xr[1], loc, scale)
+
+        def integral(x, b, loc, scale):
+            return b * truncexpon.cdf(x, self.xr[0], self.xr[1], loc, scale)
+
         return model, integral, params, limits
 
     def bernstein(self, deg: int) -> Tuple[callable, callable, dict, dict]:
-        def model(x, *args):
-            return bernstein.density(x, args, self.xr[0], self.xr[1])
-        def integral(x, b, *args):
-            return bernstein.integral(x, args, self.xr[0], self.xr[1])
         params = {f"a{i}": 1 for i in range(deg+1)}
         limits = {f"a{i}": (-1000, 1000) for i in range(deg+1)}
+
+        def model(x, *args):
+            return bernstein.density(x, args, self.xr[0], self.xr[1])
+
+        def integral(x, *args):
+            return bernstein.integral(x, args, self.xr[0], self.xr[1])
+
         return model, integral, params, limits
 
 
@@ -265,7 +296,7 @@ class SpecFit(IminuitBackend):
             },
             "background": {
                 "None": None,
-                "Constant": self.constant, 
+                "Constant": self.constant,
                 "Exponential": self.exponential,
                 "Bernstein1d": partial(self.bernstein, 1),
                 "Bernstein2d": partial(self.bernstein, 2),
@@ -274,7 +305,8 @@ class SpecFit(IminuitBackend):
             }
         }
 
-    def _parse_data(self,
+    def _parse_data(
+        self,
         x: ArrayLike,
         y: ArrayLike,
         yerr: ArrayLike = None,
@@ -294,7 +326,7 @@ class SpecFit(IminuitBackend):
             raise ValueError("x and y values must be of type float or int.")
         # Check if x values are equally spaced
         dx = np.diff(x)
-        if  np.all(dx > 0) and np.allclose(dx, dx[0], rtol=1e-5):
+        if np.all(dx > 0) and np.allclose(dx, dx[0], rtol=1e-5):
             if len(x) == len(y):
                 xe = 0.5 * (x[1:] + x[:-1])
                 self.xe = np.insert(xe, 0, xe[0] - dx[0])
@@ -359,13 +391,18 @@ class SpecFit(IminuitBackend):
             func_signature = inspect.Signature(func_signature)
             # Define the combined model function
             idx = len(sig[2])
+
             def model(x, *args):
                 return sig[0](x, *args[:idx]) + bkg[0](x, *args[idx:])
+
             # Set the new signature
             model.__signature__ = func_signature
             self._model = model
+            # Define the combined integral function
+
             def integral(x, *args):
                 return sig[1](x, *args[:idx]) + bkg[1](x, *args[idx:])
+
             # Set the new signature
             integral.__signature__ = func_signature
             self._integral = integral
@@ -388,7 +425,7 @@ class CalibrationFit(IminuitBackend):
     def _init_model_list(self) -> None:
         self._models = {
             "model": {
-                "Constant": self.constant, 
+                "Constant": self.constant,
                 "Exponential": self.exponential,
                 "Bernstein1d": partial(self.bernstein, 1),
                 "Bernstein2d": partial(self.bernstein, 2),
@@ -397,7 +434,8 @@ class CalibrationFit(IminuitBackend):
             }
         }
 
-    def _parse_data(self,
+    def _parse_data(
+        self,
         x: ArrayLike,
         y: ArrayLike,
         yerr: ArrayLike = None,
@@ -410,7 +448,7 @@ class CalibrationFit(IminuitBackend):
         if len(x) != len(y) or len(x) != len(yerr):
             raise ValueError("x, y, and yerr must have the same length.")
         if not np.issubdtype(x.dtype, np.number) or \
-              not np.issubdtype(y.dtype, np.number) or \
+            not np.issubdtype(y.dtype, np.number) or \
                 not np.issubdtype(yerr.dtype, np.number):
             raise ValueError("x, y, and yerr values must be of type float or "
                              "int.")
@@ -466,7 +504,7 @@ def fit_spectrum(
     iminuit provides accurate error estimates for the fit parameters
     and when using the "Extended" cost functions the yield parameters
     ``s`` and ``b`` are estimates of the number of signal and background
-    events in the spectrum.  
+    events in the spectrum.
 
     Parameters
     ----------
@@ -509,6 +547,7 @@ def fit_spectrum(
     else:
         fitviewer = AGEFitViewer(_fit, parent)
         fitviewer.show()
+
 
 def fit_calibration(
     x: NDArray,

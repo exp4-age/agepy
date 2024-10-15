@@ -1,13 +1,11 @@
 from __future__ import annotations
 from typing import Sequence, Tuple, Union, Dict
-from importlib.resources import path
-import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from matplotlib.lines import Line2D
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QInputDialog, QDialog, QLayout, QGridLayout, QGroupBox, QComboBox, QLineEdit
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QInputDialog, QGridLayout
+from PyQt6.QtWidgets import QLayout, QGroupBox, QComboBox, QLineEdit, QDialog
 from PyQt6.QtCore import Qt
 
 from agepy import ageplot
@@ -19,7 +17,7 @@ from agepy.interactive.fitting.labeldialog import Ui_LabelDialog
 class ParamBox(QGroupBox):
     """Parameter box for the AGE Fit Viewer. It contains a slider and
     line edits for the parameter value and the limits.
-    
+
     """
 
     def __init__(self, parameter: str, parent=None) -> None:
@@ -88,10 +86,11 @@ class ParamBox(QGroupBox):
 
 class AGEFitViewer(QMainWindow, Ui_FitWindow):
     """Window for the interactive fitting.
-    
+
     """
 
-    def __init__(self,
+    def __init__(
+        self,
         backend,
         parent: QMainWindow = None
     ) -> None:
@@ -101,10 +100,9 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
         # Set the fitting backend
         self.backend = backend
         # Add matplotlib canvas
-        #matplotlib.use("Qt5Agg")
         with ageplot.context(["age", "dataviewer"]):
             # Create and add the canvas
-            self.canvas = FigureCanvas(Figure())
+            self.canvas = FigureCanvasQTAgg(Figure())
             self.layoutFitView.addWidget(self.canvas)
             # Create the axis
             self.ax = self.canvas.figure.add_subplot(111)
@@ -114,7 +112,7 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
             self.ax.set_ylim(*self.ax.get_ylim())
             self.canvas.draw()
         # Remember the last Line2D objects in order to remove them when
-        # updating the prediction 
+        # updating the prediction
         self.mpl_lines = []
         # Initialize the cost function selection
         available_costs = self.backend.list_costs()
@@ -215,7 +213,7 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
     def update_gui_params(self):
         params = self.backend.list_params()
         for par in params:
-            self.params[par].set_value(params[par]) 
+            self.params[par].set_value(params[par])
 
     def update_prediction(self):
         # Remove the previous prediction
@@ -255,8 +253,8 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
 
     def set_title(self):
         dialog = QInputDialog(self)
-        #dialog.setWindowTitle("Set Title")
-        #dialog.setLabelText("Title:")
+        dialog.setWindowTitle("Set Axes Title")
+        dialog.setLabelText("title")
         dialog.setTextValue(self.ax.get_title())
         if dialog.exec() == QDialog.DialogCode.Accepted:
             with ageplot.context(["age", "dataviewer"]):
