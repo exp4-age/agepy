@@ -7,7 +7,7 @@ import inspect
 import numpy as np
 from iminuit import Minuit, cost
 from numba_stats import bernstein, truncnorm, truncexpon, uniform, voigt
-from numba_stats import cruijff, crystalball, crystalball_ex
+from numba_stats import cruijff, crystalball, crystalball_ex, qgaussian
 import numba as nb
 from jacobi import propagate
 # Import the internal modules
@@ -159,6 +159,33 @@ class IminuitBackend(AGEFitBackend):
 
         return model, integral, params, limits
 
+    def qgaussian(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "q": 2, "loc": 0.5 * (self.xr[0] + self.xr[1]),
+                  "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "q": (1, 3), "loc": self.xr,
+                  "scale": (0.0001 * dx, 0.5 * dx)}
+
+        def model(x, s, q, loc, scale):
+            if q < 1:
+                q = 1
+                warnings.warn("q cannot be smaller than 1. Setting q=1.")
+            if q > 3:
+                q = 3
+                warnings.warn("q cannot be larger than 3. Setting q=3.")
+            return s * qgaussian.pdf(x, q, loc, scale)
+
+        def integral(x, s, q, loc, scale):
+            if q < 1:
+                q = 1
+                warnings.warn("q cannot be smaller than 1. Setting q=1.")
+            if q > 3:
+                q = 3
+                warnings.warn("q cannot be larger than 3. Setting q=3.")
+            return s * qgaussian.cdf(x, q, loc, scale)
+
+        return model, integral, params, limits
+
     def voigt(self) -> Tuple[callable, callable, dict, dict]:
         dx = self.xr[1] - self.xr[0]
         params = {"s": 10, "gamma": 0.1 * dx,
@@ -289,6 +316,7 @@ class SpecFit(IminuitBackend):
         self._models = {
             "signal": {
                 "Gaussian": self.gaussian,
+                "Q-Gaussian": self.qgaussian,
                 "Voigt": self.voigt,
                 "Cruijff": self.cruijff,
                 "CrystalBall": self.crystalball,
@@ -426,6 +454,10 @@ class CalibrationFit(IminuitBackend):
         self._models = {
             "model": {
                 "Constant": self.constant,
+                "Linear": self.linear,
+                "Quadratic": self.quadratic,
+                "Cubic": self.cubic,
+                "Test": self.test,
                 "Exponential": self.exponential,
                 "Bernstein1d": partial(self.bernstein, 1),
                 "Bernstein2d": partial(self.bernstein, 2),
@@ -485,6 +517,44 @@ class CalibrationFit(IminuitBackend):
                 self._limits[par] = _limits[par]
         # Update the cost function
         self.select_cost(self._cost_name)
+
+    def test(self) -> Tuple[callable, callable, dict, dict]:
+        params = {"df": 1, "loc": 0, "scale": 1}
+        limits = {"df": (0, 1000), "loc": (-1000, 1000), "scale": (0, 1000)}
+
+        def model(x, df, loc, scale):
+            return t.pdf(x, df, loc, scale)
+
+        return model, None, params, limits
+
+    def linear(self) -> Tuple[callable, callable, dict, dict]:
+        params = {"a0": 1, "a1": 1}
+        limits = {"a0": (-1000, 1000), "a1": (-1000, 1000)}
+
+        def model(x, a0, a1):
+            return a1 * x + a0
+
+        return model, None, params, limits
+
+    def quadratic(self) -> Tuple[callable, callable, dict, dict]:
+        params = {"a0": 1, "a1": 1, "a2": 1}
+        limits = {"a0": (-1000, 1000), "a1": (-1000, 1000),
+                  "a2": (-1000, 1000)}
+
+        def model(x, a0, a1, a2):
+            return a2 * x**2 + a1 * x + a0
+
+        return model, None, params, limits
+
+    def cubic(self) -> Tuple[callable, callable, dict, dict]:
+        params = {"a0": 1, "a1": 1, "a2": 1, "a3": 1}
+        limits = {"a0": (-1000, 1000), "a1": (-1000, 1000),
+                  "a2": (-1000, 1000), "a3": (-1000, 1000)}
+
+        def model(x, a0, a1, a2, a3):
+            return a3 * x**3 + a2 * x**2 + a1 * x + a0
+
+        return model, None, params, limits
 
 
 def fit_spectrum(
@@ -554,7 +624,7 @@ def fit_calibration(
     y: NDArray,
     yerr: NDArray,
     cost: str = "LeastSquares",
-    model: str = "Constant",
+    model: str = "Linear",
     start: Dict[str, float] = {},
     limits: Dict[str, Tuple[float, float]] = {},
     parent: QMainWindow = None
