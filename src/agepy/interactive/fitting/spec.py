@@ -457,7 +457,6 @@ class CalibrationFit(IminuitBackend):
                 "Linear": self.linear,
                 "Quadratic": self.quadratic,
                 "Cubic": self.cubic,
-                "Test": self.test,
                 "Exponential": self.exponential,
                 "Bernstein1d": partial(self.bernstein, 1),
                 "Bernstein2d": partial(self.bernstein, 2),
@@ -517,15 +516,6 @@ class CalibrationFit(IminuitBackend):
                 self._limits[par] = _limits[par]
         # Update the cost function
         self.select_cost(self._cost_name)
-
-    def test(self) -> Tuple[callable, callable, dict, dict]:
-        params = {"df": 1, "loc": 0, "scale": 1}
-        limits = {"df": (0, 1000), "loc": (-1000, 1000), "scale": (0, 1000)}
-
-        def model(x, df, loc, scale):
-            return t.pdf(x, df, loc, scale)
-
-        return model, None, params, limits
 
     def linear(self) -> Tuple[callable, callable, dict, dict]:
         params = {"a0": 1, "a1": 1}
