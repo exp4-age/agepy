@@ -1,17 +1,22 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Union, Sequence
+from typing import TYPE_CHECKING
+# Import importlib.resources for getting the icon paths
 import importlib.resources as imrsrc
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLayout, QVBoxLayout, QWidget, QSlider
+# Import PyQt6 modules
+from PyQt6.QtWidgets import QApplication, QMainWindow, QLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QSlider
 from PyQt6.QtGui import QIcon, QAction
 from PyQt6.QtCore import pyqtSignal
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+# Import matplotlib modules
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 from matplotlib.widgets import RectangleSelector
 from matplotlib.figure import Figure
 # Internal agepy imports
 from agepy import ageplot
 # Import modules for type hinting
 if TYPE_CHECKING:
+    from typing import Union, Sequence
     from matplotlib.axes import Axes
 
 
@@ -72,7 +77,8 @@ class AGEDataViewer(QMainWindow):
         self.canvas = None
         self.toolbar = None
 
-    def add_plot(self,
+    def add_plot(
+        self,
         fig: Figure = None,
         ax: Union[Axes, Sequence[Axes]] = None,
         layout: QLayout = None,
@@ -84,9 +90,9 @@ class AGEDataViewer(QMainWindow):
         with ageplot.context(["age", "dataviewer"]):
             # Create and add the canvas
             if fig is not None:
-                self.canvas = FigureCanvas(fig)
+                self.canvas = FigureCanvasQTAgg(fig)
             else:
-                self.canvas = FigureCanvas(Figure())
+                self.canvas = FigureCanvasQTAgg(Figure())
             # Set fixed size for the canvas
             self.canvas.setFixedSize(width, height)
             if layout is None:
@@ -103,7 +109,7 @@ class AGEDataViewer(QMainWindow):
 
     def add_toolbar(self):
         # Add the toolbar
-        self.toolbar = NavigationToolbar(self.canvas, self)
+        self.toolbar = NavigationToolbar2QT(self.canvas, self)
         self.layout.addWidget(self.toolbar)
 
     def add_roi_action(self, callback: callable):
@@ -115,7 +121,8 @@ class AGEDataViewer(QMainWindow):
         actions = self.toolbar.actions()
         self.roi_button = self.toolbar.insertAction(actions[-1], roi)
 
-    def add_rect_selector(self,
+    def add_rect_selector(
+        self,
         ax: Axes,
         on_select: callable,
         interactive: bool = True
@@ -137,7 +144,8 @@ class AGEDataViewer(QMainWindow):
     def toggle_selector(self):
         self.selector.set_active(not self.selector.active)
 
-    def add_forward_backward_action(self,
+    def add_forward_backward_action(
+        self,
         bw_callback: callable,
         fw_callback: callable
     ) -> None:
