@@ -8,7 +8,7 @@ from agepy import ageplot
 if TYPE_CHECKING:
     from agepy.spec.coincidence import CoincMap
 
-__all__ = ["AGECoincViewer"]
+__all__ = []
 
 class AGECoincViewer(AGEDataViewer):
     """Interactive viewer for CoincMap objects.

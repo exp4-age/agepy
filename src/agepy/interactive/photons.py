@@ -8,7 +8,7 @@ from agepy import ageplot
 if TYPE_CHECKING:
     from agepy.spec.photons import Scan
 
-__all__ = ["AGEScanViewer"]
+__all__ = []
 
 class AGEScanViewer(AGEDataViewer):
     """Show all spectra in a scan.

@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QMainWindow
     from matplotlib.axes import Axes
     from matplotlib.lines import Line2D
-    from numpy.typing import NDArray, ArrayLike
+    from numpy.typing import ArrayLike
 
 __all__ = [
     "fit_spectrum",
@@ -38,16 +38,16 @@ __all__ = [
 
 
 def fit_spectrum(
-    x: NDArray,
-    y: NDArray,
-    yerr: NDArray = None,
+    x: ArrayLike,
+    y: ArrayLike,
+    yerr: ArrayLike = None,
     cost: str = "LeastSquares",
     sig: str = "Gaussian",
     bkg: str = "Exponential",
     start: Dict[str, float] = {},
     limits: Dict[str, Tuple[float, float]] = {},
     parent: QMainWindow = None
-) -> None:
+) -> SpectrumFit:
     """Interactively fit a spectrum with a signal and background
     component using iminuit.
 
@@ -58,14 +58,14 @@ def fit_spectrum(
 
     Parameters
     ----------
-    x : NDArray
+    x : ArrayLike
         The x values of the spectrum. Can be either the bin edges, bin
         centers or unevenly spaced values. The NLL cost functions
         require bin edges or bin centers.
-    y : NDArray
+    y : ArrayLike
         Either the bin contents, unbinned data points or the y values.
         The unbinned NLL cost function requires unbinned data points.
-    yerr : NDArray, optional
+    yerr : ArrayLike, optional
         The uncertainties of the y values. Should not be provided for
         unbinned data points, but needs to be provided for unevenly
         spaced x values. If ``y`` is the bin contents and ``yerr`` is
@@ -90,34 +90,35 @@ def fit_spectrum(
         application is created and run. Default is ``None``.
 
     """
-    _fit = SpecFit(x, y, yerr, cost, (sig, bkg), start=start, limits=limits)
+    fit = SpectrumFit(x, y, yerr, cost, (sig, bkg), start=start, limits=limits)
     if parent is None:
-        app = AGEpp(AGEFitViewer, _fit)
+        app = AGEpp(AGEFitViewer, fit)
         app.run()
     else:
-        fitviewer = AGEFitViewer(_fit, parent)
+        fitviewer = AGEFitViewer(fit, parent)
         fitviewer.show()
+    return fit
 
 
 def fit_calibration(
-    x: NDArray,
-    y: NDArray,
-    yerr: NDArray,
+    x: ArrayLike,
+    y: ArrayLike,
+    yerr: ArrayLike,
     cost: str = "LeastSquares",
     model: str = "Linear",
     start: Dict[str, float] = {},
     limits: Dict[str, Tuple[float, float]] = {},
     parent: QMainWindow = None
-) -> None:
+) -> CalibrationFit:
     """Interactively fit a calibration curve using iminuit.
 
     Parameters
     ----------
-    x : NDArray
+    x : ArrayLike
         The x values of the calibration curve.
-    y : NDArray
+    y : ArrayLike
         The y values of the calibration curve.
-    yerr : NDArray, optional
+    yerr : ArrayLike
         The uncertainties of the y values.
     cost : str, optional
         The cost function to use. Default is "LeastSquares".
@@ -135,22 +136,26 @@ def fit_calibration(
         application is created and run. Default is ``None``.
 
     """
-    _fit = CalibrationFit(x, y, yerr, cost, model, start=start, limits=limits)
+    fit = CalibrationFit(x, y, yerr, cost, model, start=start, limits=limits)
     if parent is None:
-        app = AGEpp(AGEFitViewer, _fit)
+        app = AGEpp(AGEFitViewer, fit)
         app.run()
     else:
-        fitviewer = AGEFitViewer(_fit, parent)
+        fitviewer = AGEFitViewer(fit, parent)
         fitviewer.show()
+    return fit
 
 
 class IminuitBackend(AGEFitBackend):
+    """Base class for fitting backends using iminuit.
+
+    """
 
     def __init__(
         self,
-        x: NDArray,
-        y: NDArray,
-        yerr: NDArray,
+        x: ArrayLike,
+        y: ArrayLike,
+        yerr: ArrayLike,
         cost: str,
         model: Union[str, Tuple[str, str]],
         start: Dict[str, float] = {},
@@ -265,130 +270,6 @@ class IminuitBackend(AGEFitBackend):
 
         self._numint_cdf = numint_cdf
 
-    def gaussian(self) -> Tuple[callable, callable, dict, dict]:
-        dx = self.xr[1] - self.xr[0]
-        params = {"s": 10, "loc": 0.5 * (self.xr[0] + self.xr[1]),
-                  "scale": 0.1 * dx}
-        limits = {"s": (0, 1000), "loc": self.xr,
-                  "scale": (0.0001 * dx, 0.5 * dx)}
-
-        def model(x, s, loc, scale):
-            return s * truncnorm.pdf(x, self.xr[0], self.xr[1], loc, scale)
-
-        def integral(x, s, loc, scale):
-            return s * truncnorm.cdf(x, self.xr[0], self.xr[1], loc, scale)
-
-        return model, integral, params, limits
-
-    def qgaussian(self) -> Tuple[callable, callable, dict, dict]:
-        dx = self.xr[1] - self.xr[0]
-        params = {"s": 10, "q": 2, "loc": 0.5 * (self.xr[0] + self.xr[1]),
-                  "scale": 0.1 * dx}
-        limits = {"s": (0, 1000), "q": (1, 3), "loc": self.xr,
-                  "scale": (0.0001 * dx, 0.5 * dx)}
-
-        def model(x, s, q, loc, scale):
-            if q < 1:
-                q = 1
-                warnings.warn("q cannot be smaller than 1. Setting q=1.")
-            if q > 3:
-                q = 3
-                warnings.warn("q cannot be larger than 3. Setting q=3.")
-            return s * qgaussian.pdf(x, q, loc, scale)
-
-        def integral(x, s, q, loc, scale):
-            if q < 1:
-                q = 1
-                warnings.warn("q cannot be smaller than 1. Setting q=1.")
-            if q > 3:
-                q = 3
-                warnings.warn("q cannot be larger than 3. Setting q=3.")
-            return s * qgaussian.cdf(x, q, loc, scale)
-
-        return model, integral, params, limits
-
-    def voigt(self) -> Tuple[callable, callable, dict, dict]:
-        dx = self.xr[1] - self.xr[0]
-        params = {"s": 10, "gamma": 0.1 * dx,
-                  "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
-        limits = {"s": (0, 1000), "gamma": (0.0001 * dx, 0.5 * dx),
-                  "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
-        self._jit_numint_cdf()
-        _x = np.linspace(self.xr[0], self.xr[1], 1000)
-
-        def model(x, s, gamma, loc, scale):
-            return s * voigt.pdf(x, gamma, loc, scale)
-
-        def integral(x, s, gamma, loc, scale):
-            _cdf = self._numint_cdf(_x, voigt.pdf(_x, gamma, loc, scale))
-            return s * np.interp(x, _x, _cdf)
-
-        return model, integral, params, limits
-
-    def cruijff(self) -> Tuple[callable, callable, dict, dict]:
-        dx = self.xr[1] - self.xr[0]
-        params = {"s": 10, "beta_left": 0.1, "beta_right": 0.1,
-                  "loc": 0.5 * (self.xr[0] + self.xr[1]),
-                  "scale_left": 0.1 * dx, "scale_right": 0.1 * dx}
-        limits = {"s": (0, 1000), "beta_left": (0, 1), "beta_right": (0, 1),
-                  "loc": self.xr, "scale_left": (0.0001 * dx, 0.5 * dx),
-                  "scale_right": (0.0001 * dx, 0.5 * dx)}
-        _x = np.linspace(self.xr[0], self.xr[1], 1000)
-        self._jit_numint_cdf()
-
-        def model(x, s, beta_left, beta_right, loc, scale_left, scale_right):
-            _cdf = self._numint_cdf(_x, cruijff.density(
-                _x, beta_left, beta_right, loc, scale_left, scale_right))
-            return s / _cdf[-1] * cruijff.density(
-                x, beta_left, beta_right, loc, scale_left, scale_right)
-
-        def integral(x, s, beta_left, beta_right, loc, scale_left,
-                     scale_right):
-            _cdf = self._numint_cdf(_x, cruijff.density(
-                _x, beta_left, beta_right, loc, scale_left, scale_right))
-            return s / _cdf[-1] * np.interp(x, _x, _cdf)
-
-        return model, integral, params, limits
-
-    def crystalball(self) -> Tuple[callable, callable, dict, dict]:
-        dx = self.xr[1] - self.xr[0]
-        params = {"s": 10, "beta": 1, "m": 2,
-                  "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
-        limits = {"s": (0, 1000), "beta": (0, 5), "m": (1, 10),
-                  "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
-
-        def model(x, s, beta, m, loc, scale):
-            return s * crystalball.pdf(x, beta, m, loc, scale)
-
-        def integral(x, s, beta, m, loc, scale):
-            return s * crystalball.cdf(x, beta, m, loc, scale)
-
-        return model, integral, params, limits
-
-    def crystalball_ex(self) -> Tuple[callable, callable, dict, dict]:
-        dx = self.xr[1] - self.xr[0]
-        params = {"s": 10, "beta_left": 1, "m_left": 2, "scale_left": 0.1 * dx,
-                  "beta_right": 1, "m_right": 2, "scale_right": 0.1 * dx,
-                  "loc": 0.5 * (self.xr[0] + self.xr[1])}
-        limits = {"s": (0, 1000), "beta_left": (0, 5), "m_left": (1, 10),
-                  "scale_left": (0.0001 * dx, 0.5 * dx), "beta_right": (0, 5),
-                  "m_right": (1, 10), "scale_right": (0.0001 * dx, 0.5 * dx),
-                  "loc": self.xr}
-
-        def model(x, s, beta_left, m_left, scale_left, beta_right, m_right,
-                  scale_right, loc):
-            return s * crystalball_ex.pdf(
-                x, beta_left, m_left, scale_left, beta_right, m_right,
-                scale_right, loc)
-
-        def integral(x, s, beta_left, m_left, scale_left, beta_right, m_right,
-                     scale_right, loc):
-            return s * crystalball_ex.cdf(
-                x, beta_left, m_left, scale_left, beta_right, m_right,
-                scale_right, loc)
-
-        return model, integral, params, limits
-
     def constant(self) -> Tuple[callable, callable, dict, dict]:
         params = {"b": 10}
         limits = {"b": (0, 1000)}
@@ -427,7 +308,7 @@ class IminuitBackend(AGEFitBackend):
         return model, integral, params, limits
 
 
-class SpecFit(IminuitBackend):
+class SpectrumFit(IminuitBackend):
     """Backend for interactive fitting of a spectrum with signal and
     background components using iminuit.
 
@@ -565,9 +446,134 @@ class SpecFit(IminuitBackend):
         # Update the cost function
         self.select_cost(self._cost_name)
 
+    def gaussian(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "loc": 0.5 * (self.xr[0] + self.xr[1]),
+                  "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "loc": self.xr,
+                  "scale": (0.0001 * dx, 0.5 * dx)}
+
+        def model(x, s, loc, scale):
+            return s * truncnorm.pdf(x, self.xr[0], self.xr[1], loc, scale)
+
+        def integral(x, s, loc, scale):
+            return s * truncnorm.cdf(x, self.xr[0], self.xr[1], loc, scale)
+
+        return model, integral, params, limits
+
+    def qgaussian(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "q": 2, "loc": 0.5 * (self.xr[0] + self.xr[1]),
+                  "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "q": (1, 3), "loc": self.xr,
+                  "scale": (0.0001 * dx, 0.5 * dx)}
+
+        def model(x, s, q, loc, scale):
+            if q < 1:
+                q = 1
+                warnings.warn("q cannot be smaller than 1. Setting q=1.")
+            if q > 3:
+                q = 3
+                warnings.warn("q cannot be larger than 3. Setting q=3.")
+            return s * qgaussian.pdf(x, q, loc, scale)
+
+        def integral(x, s, q, loc, scale):
+            if q < 1:
+                q = 1
+                warnings.warn("q cannot be smaller than 1. Setting q=1.")
+            if q > 3:
+                q = 3
+                warnings.warn("q cannot be larger than 3. Setting q=3.")
+            return s * qgaussian.cdf(x, q, loc, scale)
+
+        return model, integral, params, limits
+
+    def voigt(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "gamma": 0.1 * dx,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "gamma": (0.0001 * dx, 0.5 * dx),
+                  "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
+        self._jit_numint_cdf()
+        _x = np.linspace(self.xr[0], self.xr[1], 1000)
+
+        def model(x, s, gamma, loc, scale):
+            return s * voigt.pdf(x, gamma, loc, scale)
+
+        def integral(x, s, gamma, loc, scale):
+            _cdf = self._numint_cdf(_x, voigt.pdf(_x, gamma, loc, scale))
+            return s * np.interp(x, _x, _cdf)
+
+        return model, integral, params, limits
+
+    def cruijff(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "beta_left": 0.1, "beta_right": 0.1,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1]),
+                  "scale_left": 0.1 * dx, "scale_right": 0.1 * dx}
+        limits = {"s": (0, 1000), "beta_left": (0, 1), "beta_right": (0, 1),
+                  "loc": self.xr, "scale_left": (0.0001 * dx, 0.5 * dx),
+                  "scale_right": (0.0001 * dx, 0.5 * dx)}
+        _x = np.linspace(self.xr[0], self.xr[1], 1000)
+        self._jit_numint_cdf()
+
+        def model(x, s, beta_left, beta_right, loc, scale_left, scale_right):
+            _cdf = self._numint_cdf(_x, cruijff.density(
+                _x, beta_left, beta_right, loc, scale_left, scale_right))
+            return s / _cdf[-1] * cruijff.density(
+                x, beta_left, beta_right, loc, scale_left, scale_right)
+
+        def integral(x, s, beta_left, beta_right, loc, scale_left,
+                     scale_right):
+            _cdf = self._numint_cdf(_x, cruijff.density(
+                _x, beta_left, beta_right, loc, scale_left, scale_right))
+            return s / _cdf[-1] * np.interp(x, _x, _cdf)
+
+        return model, integral, params, limits
+
+    def crystalball(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "beta": 1, "m": 2,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1]), "scale": 0.1 * dx}
+        limits = {"s": (0, 1000), "beta": (0, 5), "m": (1, 10),
+                  "loc": self.xr, "scale": (0.0001 * dx, 0.5 * dx)}
+
+        def model(x, s, beta, m, loc, scale):
+            return s * crystalball.pdf(x, beta, m, loc, scale)
+
+        def integral(x, s, beta, m, loc, scale):
+            return s * crystalball.cdf(x, beta, m, loc, scale)
+
+        return model, integral, params, limits
+
+    def crystalball_ex(self) -> Tuple[callable, callable, dict, dict]:
+        dx = self.xr[1] - self.xr[0]
+        params = {"s": 10, "beta_left": 1, "m_left": 2, "scale_left": 0.1 * dx,
+                  "beta_right": 1, "m_right": 2, "scale_right": 0.1 * dx,
+                  "loc": 0.5 * (self.xr[0] + self.xr[1])}
+        limits = {"s": (0, 1000), "beta_left": (0, 5), "m_left": (1, 10),
+                  "scale_left": (0.0001 * dx, 0.5 * dx), "beta_right": (0, 5),
+                  "m_right": (1, 10), "scale_right": (0.0001 * dx, 0.5 * dx),
+                  "loc": self.xr}
+
+        def model(x, s, beta_left, m_left, scale_left, beta_right, m_right,
+                  scale_right, loc):
+            return s * crystalball_ex.pdf(
+                x, beta_left, m_left, scale_left, beta_right, m_right,
+                scale_right, loc)
+
+        def integral(x, s, beta_left, m_left, scale_left, beta_right, m_right,
+                     scale_right, loc):
+            return s * crystalball_ex.cdf(
+                x, beta_left, m_left, scale_left, beta_right, m_right,
+                scale_right, loc)
+
+        return model, integral, params, limits
+
 
 class CalibrationFit(IminuitBackend):
-    """
+    """Backend for interactive fitting of a calibration curve using
+    iminuit.
 
     """
 
@@ -583,6 +589,7 @@ class CalibrationFit(IminuitBackend):
                 "Bernstein2d": partial(self.bernstein, 2),
                 "Bernstein3d": partial(self.bernstein, 3),
                 "Bernstein4d": partial(self.bernstein, 4),
+                "Bernstein5d": partial(self.bernstein, 5),
             }
         }
 
