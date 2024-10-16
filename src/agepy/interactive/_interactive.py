@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 # Import importlib.resources for getting the icon paths
-import importlib.resources as imrsrc
+from importlib.resources import path as ilrpath
 # Import PyQt6 modules
 from PyQt6.QtWidgets import (
     QApplication,
@@ -124,7 +124,7 @@ class AGEDataViewer(QMainWindow):
 
     def add_roi_action(self, callback: callable):
         # Add ROI button to toolbar
-        with imrsrc.path("agepy.interactive.icons", "roi.svg") as ipath:
+        with ilrpath("agepy.interactive.icons", "roi.svg") as ipath:
             roi = QAction(QIcon(str(ipath)), "Add ROI", self)
         roi.setCheckable(True)
         roi.triggered.connect(callback)
@@ -161,19 +161,19 @@ class AGEDataViewer(QMainWindow):
     ) -> None:
         actions = self.toolbar.actions()
         # Add backward step to toolbar
-        with imrsrc.path("agepy.interactive.icons", "bw-step.svg") as ipath:
+        with ilrpath("agepy.interactive.icons", "bw-step.svg") as ipath:
             bw = QAction(QIcon(str(ipath)), "Step Backward", self)
         bw.triggered.connect(bw_callback)
         self.bw = self.toolbar.insertAction(actions[-1], bw)
         # Add forward step to toolbar
-        with imrsrc.path("agepy.interactive.icons", "fw-step.svg") as ipath:
+        with ilrpath("agepy.interactive.icons", "fw-step.svg") as ipath:
             fw = QAction(QIcon(str(ipath)), "Step Forward", self)
         fw.triggered.connect(fw_callback)
         self.fw = self.toolbar.insertAction(actions[-1], fw)
 
     def add_lookup_action(self, callback: callable) -> None:
         actions = self.toolbar.actions()
-        with imrsrc.path("agepy.interactive.icons", "search.svg") as ipath:
+        with ilrpath("agepy.interactive.icons", "search.svg") as ipath:
             lu = QAction(QIcon(str(ipath)), "Look Up", self)
         lu.triggered.connect(callback)
         self.lu = self.toolbar.insertAction(actions[-1], lu)

@@ -166,6 +166,8 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
 
     def change_cost(self):
         self.backend.select_cost(self.selectCost.currentText())
+        # Update the selected cost in case selecting the new cost failed
+        self.selectCost.setCurrentText(self.backend.which_cost())
 
     def change_model(self):
         # Get the selected models
@@ -175,6 +177,9 @@ class AGEFitViewer(QMainWindow, Ui_FitWindow):
                 model_type].currentText()
         # Pass the selected models to the backend
         self.backend.select_model(**selected_model)
+        # Update the selected cost in case the new model does not support
+        # the current cost
+        self.selectCost.setCurrentText(self.backend.which_cost())
         # Get the new parameters
         params = self.backend.list_params()
         limits = self.backend.list_limits()
@@ -316,8 +321,12 @@ class AGEFitBackend:
 
     def select_model(self, model: str) -> None:
         self._model_name = model
+        self._model = self._models["model"][model]
         self._params = {"Not implemented!": 0}
         self._limits = {"Not implemented!": (-1, 1)}
+
+    def get_model(self) -> callable:
+        return self._model
 
     def list_params(self) -> Dict[str, float]:
         return self._params
