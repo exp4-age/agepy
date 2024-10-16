@@ -5,6 +5,7 @@ from functools import partial
 # Import the modules for the fitting
 import numpy as np
 from iminuit import Minuit, cost
+from iminuit._repr_text import format_row, format_line, pdg_format
 from numba_stats import (
     bernstein,
     truncnorm,
@@ -20,7 +21,8 @@ import numba as nb
 import jax
 from jax import numpy as jnp
 from jax.scipy.stats import norm as jnorm
-from jax.scipy.stats import expon as jexpon 
+from jax.scipy.stats import expon as jexpon
+from resample.bootstrap import variance as bvar
 from jacobi import propagate
 # Import the internal modules
 from agepy import ageplot
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
     from PyQt6.QtWidgets import QMainWindow
     from matplotlib.axes import Axes
     from matplotlib.lines import Line2D
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
 __all__ = [
     "fit_spectrum",
@@ -205,9 +207,7 @@ class IminuitBackend(AGEFitBackend):
             self._cost = cost.LeastSquares(
                 self.x, self.y, self.yerr, self._model)
         elif name == "RobustLeastSquares":
-            self._cost = cost.LeastSquares(
-                self.x, self.y, self.yerr, self._model)
-            self._cost.loss = "soft_l1"
+            self._cost = self._robust_leastsquares(self.x, self.y, self.yerr)
         elif name == "LeastSquaresWithXUncertainties":
             if self._jax_model is None:
                 warnings.warn("Derivative not available for the selected "
@@ -239,27 +239,48 @@ class IminuitBackend(AGEFitBackend):
             self._cost = cost.ExtendedUnbinnedNLL(self.data, model)
         self._cov = None
 
+    def _robust_leastsquares(
+        self,
+        x: NDArray,
+        y: NDArray,
+        yerr: NDArray
+    ) -> cost.LeastSquares:
+        return cost.LeastSquares(x, y, yerr, self._model, loss="soft_l1")
+
     def fit(self) -> None:
-        par_values = np.array([self._params[par] for par in self._params])
-        par_names = list(self._params)
-        self._minuit = Minuit(self._cost, par_values, name=par_names)
+        self._minuit = Minuit(
+            self._cost, self.values(), name=list(self._params))
         for name, limits in self._limits.items():
             self._minuit.limits[name] = limits
         self._minuit.migrad()
         if not self._minuit.valid:
             self._minuit.migrad()
-        for par in self._params:
-            self._params[par] = self._minuit.values[par]
-        if self._minuit.accurate:
+        if self._cost_name == "RobustLeastSquares":
+            berr = bvar(self._bootstrap_robust_leastsquares, self.x, self.y,
+                        self.yerr, size=1000, random_state=1)
+            self._cov = np.array(berr)
+        elif self._minuit.accurate:
             self._cov = np.array(self._minuit.covariance)
         else:
             self._cov = None
+        for par in self._params:
+            self._params[par] = self._minuit.values[par]
+
+    def _bootstrap_robust_leastsquares(self, x, y, yerr):
+        _cost = self._robust_leastsquares(x, y, yerr)
+        _m = Minuit(_cost, self.values(), name=list(self._params))
+        for name, limits in self._limits.items():
+            _m.limits[name] = limits
+        _m.migrad()
+        if not _m.valid:
+            _m.migrad()
+        return _m.values
 
     def plot_data(self, ax: Axes) -> None:
         ax.errorbar(self.x, self.y, yerr=self.yerr, xerr=self.xerr, fmt="s",
                     color=ageplot.colors[0])
         ax.set_xlim(*self.xr)
-        ax.set_title("Spectrum Fit (iminuit)")
+        ax.set_title("iminuit")
 
     def plot_prediction(self, ax: Axes) -> Sequence[Line2D]:
         dx = 1
@@ -285,13 +306,34 @@ class IminuitBackend(AGEFitBackend):
             mpl_lines.append(pred_errband)
         return mpl_lines
 
+    def values(self) -> NDArray:
+        return np.array([self._params[par] for par in self._params])
+
     def get_result(self) -> Minuit:
         return self._minuit
 
     def print_result(self) -> str:
+        res = ""
         if self._minuit is None:
-            return "No fit performed."
-        return self._minuit.__str__()
+            l1 = format_line([19], "┌┐")
+            header = format_row([19], "No fit performed!")
+            l2 = format_line([19], "└┘")
+            return "\n".join((l1, header, l2)) + "\n"
+        if self._cost_name == "RobustLeastSquares":
+            berr = np.sqrt(self._cov)
+            n = len(self._params)
+            ws = [15] + [11] * n
+            l1 = format_line(ws, ["┌"] + ["┬"] * n + ["┐"])
+            header = format_row(ws, "", *list(self._params))
+            l2 = format_line(ws, "├" + "┼" * n + "┤")
+            l3 = format_line(ws, "└" + "┴" * n + "┘")
+            x = []
+            for err in berr:
+                x.append(pdg_format(None, err)[0])
+            errors = format_row(ws, "Bootstrap Err", *x)
+            res += "\n".join((l1, header, l2, errors, l3)) + "\n"
+        res += self._minuit.__str__()
+        return res
 
     def _jit_numint_cdf(self) -> None:
         if self._numint_cdf is not None:
