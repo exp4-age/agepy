@@ -36,10 +36,7 @@ if TYPE_CHECKING:
     from matplotlib.lines import Line2D
     from numpy.typing import ArrayLike, NDArray
 
-__all__ = [
-    "fit_spectrum",
-    "fit_calibration"
-]
+__all__ = []
 
 
 def fit_spectrum(
@@ -94,6 +91,36 @@ def fit_spectrum(
     parent : QMainWindow, optional
         The parent window for the fit viewer. If not provided, a new
         application is created and run. Default is ``None``.
+
+    Returns
+    -------
+    SpectrumFit
+        The fit object containing the fit results.
+
+    Examples
+    --------    
+
+    Import the ``fit_spectrum`` function and create some example data:
+
+    >>> import numpy as np
+    >>> from agepy.interactive import fit_spectrum
+
+    >>> xr = (0, 2)
+    >>> rng = np.random.default_rng(42)
+    >>> xdata = rng.normal(1, 0.1, size=1000)
+    >>> ydata = rng.exponential(size=len(xdata))
+    >>> xmix = np.append(xdata, ydata)
+    >>> xmix = xmix[(xr[0] < xmix) & (xmix < xr[1])]
+    >>> n, xe = np.histogram(xmix, bins=20, range=xr)
+
+    Interactive fit of unbinned data:    
+
+    >>> fit_spectrum(x=xe, y=xmix)
+
+    
+    Interactive fit of binned data:
+
+    >>> fit_spectrum(x=xe, y=n)
 
     """
     fit = SpectrumFit(x, y, xerr, yerr, cost, (sig, bkg), start=start,
@@ -294,17 +321,33 @@ class IminuitBackend(AGEFitBackend):
         else:
             y, ycov = propagate(lambda p: self._model(x, p), params, cov)
             yerr = np.sqrt(np.diag(ycov)) * dx
+        # Calculate the chi2
+        chi2 = np.sum(
+            (self._model(self.x, params) * dx - self.y)**2 / self.yerr**2)
+        chi2_ndof = chi2 / (len(self.x) - len(params))
+        if self._minuit is not None:
+            _chi2_ndof = self._minuit.fmin.reduced_chi2
+            if not np.isnan(_chi2_ndof):
+                chi2_ndof = _chi2_ndof
         # Normalize the prediction
         y = np.copy(y) * dx
         # Draw the prediction
-        pred_line, = ax.plot(x, y, color=ageplot.colors[1])
+        pred_line, = ax.plot(x, y, color=ageplot.colors[1],
+            label=r"$\chi^2\,/\,n_\text{dof} = $" + f"{chi2_ndof:.1f}")
         mpl_lines = [pred_line]
+        # Clear the legend
+        ax.legend().remove()
+        # Draw the legend
+        ax.legend()
         # Draw 1 sigma error band
         if cov is not None:
             pred_errband = ax.fill_between(
                 x, y - yerr, y + yerr, facecolor=ageplot.colors[1], alpha=0.5)
             mpl_lines.append(pred_errband)
         return mpl_lines
+
+    def get_model(self) -> callable:
+        return self._model
 
     def values(self) -> NDArray:
         return np.array([self._params[par] for par in self._params])
@@ -542,6 +585,19 @@ class SpectrumFit(IminuitBackend):
                 self._limits[par] = _limits[par]
         # Update the cost function
         self.select_cost(self._cost_name)
+
+    def get_model(self, which=None) -> callable:
+        if which is None:
+            return self._model
+        elif which == "signal":
+            model_name = self._model_name["signal"]
+            return self._models["signal"][model_name]()[0]
+        elif which == "background":
+            model_name = self._model_name["background"]
+            return self._models["background"][model_name]()[0]
+        else:
+            raise ValueError(f"Unknown model type {which}. Can be either "
+                             "'signal' or 'background'.")
 
     def gaussian(self) -> Tuple[callable, callable, dict, dict]:
         dx = self.xr[1] - self.xr[0]

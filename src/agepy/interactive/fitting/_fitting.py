@@ -18,9 +18,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 # Import internal modules
 from agepy import ageplot
-from agepy.interactive import FloatSlider
-from agepy.interactive.fitting.fitwindow import Ui_FitWindow
-from agepy.interactive.fitting.labeldialog import Ui_LabelDialog
+from agepy.interactive.ui import Ui_FitWindow, Ui_LabelDialog, Ui_FloatSlider
 # Import modules for type hinting
 if TYPE_CHECKING:
     from typing import Union, Sequence, Dict, Tuple
@@ -44,7 +42,7 @@ class ParamBox(QGroupBox):
         # Add line edit to display slider value
         self.editValue = QLineEdit()
         # Add value slider
-        self.slider = FloatSlider(Qt.Orientation.Horizontal,
+        self.slider = Ui_FloatSlider(Qt.Orientation.Horizontal,
                                   line_edit=self.editValue)
         # Add line edit for changing the limits
         self.editLLimit = QLineEdit()

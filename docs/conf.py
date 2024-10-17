@@ -43,7 +43,8 @@ extensions = [
     "nbsphinx",  # https://jupyter-tutorial.readthedocs.io/de/latest/sphinx/nbsphinx.html
 ]
 
-autosummary_imported_members = False
+#autosummary_imported_members = False
+autosummary_ignore_module_all = False
 autosummary_generate = True
 autoclass_content = "class"
 html_show_sourcelink = False

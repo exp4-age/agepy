@@ -51,5 +51,11 @@ numba-stats
 # jacobi https://pypi.org/project/jacobi/
 jacobi
 
+# resample https://pypi.org/project/resample/
+resample
+
+# jax https://pypi.org/project/jax/
+jax
+
 # lmfit https://pypi.org/project/lmfit/
 lmfit
